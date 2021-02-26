@@ -7,11 +7,7 @@ from tensorflow.keras import layers
 import pickle
 import os
 import matplotlib.pyplot as plt
-print()
-print("Setting logger level")
-print()
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-tf.get_logger().setLevel('ERROR')
+
 
 ##Create a sampling layer
 class Sampling(layers.Layer):
@@ -91,44 +87,25 @@ class VAE(keras.Model):
             "kl_loss": self.kl_loss_tracker.result(),
         }
 
-(x_train, _), (x_test, _) = keras.datasets.mnist.load_data()
-print("Iris dataset:")
-print(x_train.shape)
-print(type(x_train))
 
-# mnist_digits = np.concatenate([x_train, x_test], axis=0)
-# mnist_digits = np.expand_dims(mnist_digits, -1).astype("float32") / 255
 
+##Load dataset
 with open('../pickelled/pointclouds.pickle', 'rb') as f:
-    # The protocol version used is detected automatically, so we do not
-    # have to specify it.
     pointcloud_array = np.array(pickle.load(f))
-
-# training_set = pointcloud_array[:70]
-# test_set = pointcloud_array[70:]
-
-print("Pointcloud dataset:")
-print(pointcloud_array.shape)
-print(type(pointcloud_array))
 
 pointcloud_array = np.reshape(pointcloud_array,(100,65,65,20,1))
 
-print("Pointcloud reshaped dataset:")
-print(pointcloud_array.shape)
-
+##Construct autoencoder and train
 vae = VAE(encoder, decoder)
 vae.compile(optimizer=keras.optimizers.Adam())
-vae.fit(pointcloud_array[:,:64,:64,:], epochs=1, batch_size=64)
-print(pointcloud_array[:,:64,:64,:,:].shape)
-print(pointcloud_array[:,:64,:64,:].shape)
-print(pointcloud_array[0,:64,:64,:,:].shape)
-input_pc = np.array([pointcloud_array[0,:64,:64,:,:]])
-print(input_pc.shape)
+vae.fit(pointcloud_array[:,:64,:64,:], epochs=30, batch_size=64)
 
+##Do inference to monitor results
+input_pc = np.array([pointcloud_array[0,:64,:64,:,:]])
 latent_space= vae.encoder.predict(input_pc)
 print(f'Latent space z_mean: {latent_space[0]}, \n z_log_var:{latent_space[1]} \n and z: {latent_space[2]}')
 test_image = vae.decoder.predict(latent_space[2])[0,:,:,:]
-print(test_image.shape)
+
 for im in range(test_image.shape[2]):
     plt.imshow(test_image[:,:,im], cmap="gray") 
     plt.show()
