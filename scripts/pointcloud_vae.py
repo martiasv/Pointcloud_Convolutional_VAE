@@ -6,6 +6,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 import pickle
 import os
+import matplotlib.pyplot as plt
 print()
 print("Setting logger level")
 print()
@@ -24,7 +25,7 @@ class Sampling(layers.Layer):
         return z_mean + tf.exp(0.5 * z_log_var) * epsilon
 
 ##Build the encoder
-latent_dim = 5
+latent_dim = 10
 
 encoder_inputs = keras.Input(shape=(64, 64, 20, 1))
 x = layers.Conv3D(32, 3, activation="relu", strides=2, padding="same")(encoder_inputs)
@@ -117,65 +118,18 @@ print(pointcloud_array.shape)
 
 vae = VAE(encoder, decoder)
 vae.compile(optimizer=keras.optimizers.Adam())
-vae.fit(pointcloud_array[:,:64,:64,:], epochs=30, batch_size=64)
+vae.fit(pointcloud_array[:,:64,:64,:], epochs=1, batch_size=64)
+print(pointcloud_array[:,:64,:64,:,:].shape)
+print(pointcloud_array[:,:64,:64,:].shape)
+print(pointcloud_array[0,:64,:64,:,:].shape)
+input_pc = np.array([pointcloud_array[0,:64,:64,:,:]])
+print(input_pc.shape)
 
-test_image = np.reshape(vae.predict(pointcloud_array[0,:,:,:,:]),(64,64,20))
+latent_space= vae.encoder.predict(input_pc)
+print(f'Latent space z_mean: {latent_space[0]}, \n z_log_var:{latent_space[1]} \n and z: {latent_space[2]}')
+test_image = vae.decoder.predict(latent_space[2])[0,:,:,:]
+print(test_image.shape)
 for im in range(test_image.shape[2]):
-    plt.imshow(pointcloud[:,:,im], cmap="gray") 
-    plt.show()
-    
-
-import matplotlib.pyplot as plt
-
-
-def plot_latent_space(vae, n=30, figsize=15):
-    # display a n*n 2D manifold of digits
-    digit_size = 28
-    scale = 1.0
-    figure = np.zeros((digit_size * n, digit_size * n))
-    # linearly spaced coordinates corresponding to the 2D plot
-    # of digit classes in the latent space
-    grid_x = np.linspace(-scale, scale, n)
-    grid_y = np.linspace(-scale, scale, n)[::-1]
-
-    for i, yi in enumerate(grid_y):
-        for j, xi in enumerate(grid_x):
-            z_sample = np.array([[xi, yi]])
-            x_decoded = vae.decoder.predict(z_sample)
-            digit = x_decoded[0].reshape(digit_size, digit_size)
-            figure[
-                i * digit_size : (i + 1) * digit_size,
-                j * digit_size : (j + 1) * digit_size,
-            ] = digit
-
-    plt.figure(figsize=(figsize, figsize))
-    start_range = digit_size // 2
-    end_range = n * digit_size + start_range
-    pixel_range = np.arange(start_range, end_range, digit_size)
-    sample_range_x = np.round(grid_x, 1)
-    sample_range_y = np.round(grid_y, 1)
-    plt.xticks(pixel_range, sample_range_x)
-    plt.yticks(pixel_range, sample_range_y)
-    plt.xlabel("z[0]")
-    plt.ylabel("z[1]")
-    plt.imshow(figure, cmap="Greys_r")
+    plt.imshow(test_image[:,:,im], cmap="gray") 
     plt.show()
 
-
-#plot_latent_space(vae)
-
-def plot_label_clusters(vae, data, labels):
-    # display a 2D plot of the digit classes in the latent space
-    z_mean, _, _ = vae.encoder.predict(data)
-    plt.figure(figsize=(12, 10))
-    plt.scatter(z_mean[:, 0], z_mean[:, 1], c=labels)
-    plt.colorbar()
-    plt.xlabel("z[0]")
-    plt.ylabel("z[1]")
-    plt.show()
-
-
-#(x_train, y_train), _ = keras.datasets.mnist.load_data()
-#x_train = np.expand_dims(x_train, -1).astype("float32") / 255
-
-#plot_label_clusters(vae, x_train, y_train)
