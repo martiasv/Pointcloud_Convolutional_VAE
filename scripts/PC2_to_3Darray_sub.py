@@ -13,7 +13,7 @@ import pickle
 
 
 
-class unordered_pointcloud_to_3Darray():
+class unordered_pointcloud_to_3Darray_dataset():
     def __init__(self,pc_topic="/gagarin/tsdf_server/tsdf_pointcloud"):
         self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_callback)
         self.XYZI_pointclouds = []
@@ -42,17 +42,20 @@ class unordered_pointcloud_to_3Darray():
         # print(f'Execution time 2 [ms]:{timedelta(seconds = end_time_2 - start_time_2).microseconds/1000}')
         # print(f'Execution time 3 [ms]:{timedelta(seconds = end_time_3 - start_time_3).microseconds/1000}')
         # print(f'Total execution time[ms]:{timedelta(seconds = end_time_1 - start_time_1).microseconds/1000+timedelta(seconds = end_time_2 - start_time_2).microseconds/1000+timedelta(seconds = end_time_3 - start_time_3).microseconds/1000}')
-        if self.count%10==0:
-            self.XYZI_pointclouds.append(xyzi)
-        if len(self.XYZI_pointclouds)==100:
-            with open('src/pointcloud_utils/pickelled/pointclouds_2.pickle', 'wb') as f:
+        self.count +=1
+        self.XYZI_pointclouds.append(xyzi)
+        print(f'{self.count} pointclouds')
+        if len(self.XYZI_pointclouds)==1000:
+            with open(f'src/pointcloud_utils/pickelled/pointclouds_batch{self.count//5000}.pickle', 'wb') as f:
                 pickle.dump(self.XYZI_pointclouds, f, pickle.HIGHEST_PROTOCOL)
-                print("Pickling complete")
+            print(f'Batch {self.count//5000}: Pickling complete')
+            self.XYZI_pointclouds = []
+
 
 
 def main():
     rospy.init_node('PC2_subscriber')
-    pc_saver = unordered_pointcloud_to_3Darray()
+    pc_saver = unordered_pointcloud_to_3Darray_dataset()
     rospy.spin()
 
 

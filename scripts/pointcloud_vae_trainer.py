@@ -13,6 +13,9 @@ with open('../pickelled/pointclouds.pickle', 'rb') as f:
 
 pointcloud_array = np.reshape(pointcloud_array,(100,65,65,20,1))
 
+#Shuffle dataset
+np.random.shuffle(pointcloud_array)
+
 ##Construct autoencoder and train
 vae = CVAE.VAE()
 vae.compile(optimizer=keras.optimizers.Adam())
