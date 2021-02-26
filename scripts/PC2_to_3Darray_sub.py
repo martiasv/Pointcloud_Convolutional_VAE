@@ -13,7 +13,7 @@ import pickle
 
 
 
-class unordered_pointcloud_to_tf():
+class unordered_pointcloud_to_3Darray():
     def __init__(self,pc_topic="/gagarin/tsdf_server/tsdf_pointcloud"):
         self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_callback)
         self.XYZI_pointclouds = []
@@ -52,7 +52,7 @@ class unordered_pointcloud_to_tf():
 
 def main():
     rospy.init_node('PC2_subscriber')
-    pc_saver = unordered_pointcloud_to_tf()
+    pc_saver = unordered_pointcloud_to_3Darray()
     rospy.spin()
 
 

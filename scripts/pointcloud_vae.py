@@ -5,6 +5,12 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 import pickle
+import os
+print()
+print("Setting logger level")
+print()
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+tf.get_logger().setLevel('ERROR')
 
 ##Create a sampling layer
 class Sampling(layers.Layer):
@@ -37,7 +43,7 @@ x = layers.Dense(16*16*5*64, activation="relu")(latent_inputs)
 x = layers.Reshape((16, 16, 5, 64))(x)
 x = layers.Conv3DTranspose(64, 3, activation="relu", strides=2, padding="same")(x)
 x = layers.Conv3DTranspose(32, 3, activation="relu", strides=2, padding="same")(x)
-decoder_outputs = layers.Conv3DTranspose(1, 3, activation="sigmoid", padding="same")(x)
+decoder_outputs = layers.Conv3DTranspose(1, 3, activation="relu", padding="same")(x)
 decoder = keras.Model(latent_inputs, decoder_outputs, name="decoder")
 decoder.summary()
 
@@ -84,21 +90,40 @@ class VAE(keras.Model):
             "kl_loss": self.kl_loss_tracker.result(),
         }
 
-# (x_train, _), (x_test, _) = keras.datasets.mnist.load_data()
+(x_train, _), (x_test, _) = keras.datasets.mnist.load_data()
+print("Iris dataset:")
+print(x_train.shape)
+print(type(x_train))
+
 # mnist_digits = np.concatenate([x_train, x_test], axis=0)
 # mnist_digits = np.expand_dims(mnist_digits, -1).astype("float32") / 255
 
 with open('../pickelled/pointclouds.pickle', 'rb') as f:
     # The protocol version used is detected automatically, so we do not
     # have to specify it.
-    pointcloud_array = pickle.load(f)
+    pointcloud_array = np.array(pickle.load(f))
 
 # training_set = pointcloud_array[:70]
 # test_set = pointcloud_array[70:]
 
+print("Pointcloud dataset:")
+print(pointcloud_array.shape)
+print(type(pointcloud_array))
+
+pointcloud_array = np.reshape(pointcloud_array,(100,65,65,20,1))
+
+print("Pointcloud reshaped dataset:")
+print(pointcloud_array.shape)
+
 vae = VAE(encoder, decoder)
 vae.compile(optimizer=keras.optimizers.Adam())
-vae.fit(pointcloud_array, epochs=30, batch_size=128)
+vae.fit(pointcloud_array[:,:64,:64,:], epochs=30, batch_size=64)
+
+test_image = np.reshape(vae.predict(pointcloud_array[0,:,:,:,:]),(64,64,20))
+for im in range(test_image.shape[2]):
+    plt.imshow(pointcloud[:,:,im], cmap="gray") 
+    plt.show()
+    
 
 import matplotlib.pyplot as plt
 
