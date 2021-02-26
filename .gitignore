@@ -1,2 +1,5 @@
 #Ignore all pickle files
 *.pickle
+
+#Ignore all model weights
+saved_model_weights/**

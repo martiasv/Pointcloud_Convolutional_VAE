@@ -24,7 +24,7 @@ class VAE(keras.Model):
         self.latent_dim = latent_dim = 10
         self.batch_size = 64
         self.epochs  = 32
-        self.save_freq = 10
+        self.save_freq = 15
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
         self.total_loss_tracker = keras.metrics.Mean(name="total_loss")
@@ -32,11 +32,11 @@ class VAE(keras.Model):
             name="reconstruction_loss"
         )
         self.kl_loss_tracker = keras.metrics.Mean(name="kl_loss")
-        self.checkpoint_path = "../saved_model_weights/"+ f'{datetime.now().day}-{datetime.now().month}_{datetime.now().hour}:{datetime.now().minute}' +"/cp-{epoch:04d}.ckpt"
+        self.checkpoint_path = "../saved_model_weights/"+ f'{datetime.now().day}-{datetime.now().month}_{datetime.now().hour}:{datetime.now().minute}' +"/{epoch:04d}/cp-.ckpt"
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
         self.cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.checkpoint_path,
                                                  save_weights_only=True,
-                                                 verbose=1,save_freq=self.save_freq*self.batch_size)
+                                                 verbose=1,save_freq=self.save_freq)
     
     def build_encoder(self):
         encoder_inputs = keras.Input(shape=(64, 64, 20, 1))
