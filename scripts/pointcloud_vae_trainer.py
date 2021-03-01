@@ -7,11 +7,17 @@ from tensorflow import keras
 from tensorflow.keras import layers
 import Convolutional_variational_autoencoder as CVAE
 
-##Load dataset
-with open('../pickelled/pointclouds.pickle', 'rb') as f:
-    pointcloud_array = np.array(pickle.load(f))
+pointcloud_list = []
+num_batches = 3
 
-pointcloud_array = np.reshape(pointcloud_array,(100,65,65,20,1))
+##Load dataset
+for i in range(num_batches):
+    with open('../pickelled/cave/pointclouds_batch'+str(i)+'.pickle', 'rb') as f:
+        pointcloud_list.append(np.array(pickle.load(f)))
+
+pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches,65,65,20,1))
+
+print(pointcloud_array.shape)
 
 #Shuffle dataset
 np.random.shuffle(pointcloud_array)
