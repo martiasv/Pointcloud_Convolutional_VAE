@@ -19,9 +19,6 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
-  Eigen3
-  Open3D
-  open3d_conversions
   geometry_msgs
   message_generation
 )
@@ -35,17 +32,12 @@ generate_messages()
 
 catkin_package(
  INCLUDE_DIRS include
- LIBRARIES open3d_conversions
  CATKIN_DEPENDS roscpp sensor_msgs message_runtime
- DEPENDS EIGEN3 Open3D
 )
 
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIR}
-  ${Open3D_INCLUDE_DIRS}
-  ${open3d_conversions_INCLUDE_DIRS}
 )
 
 

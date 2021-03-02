@@ -5,3 +5,5 @@ pickelled/*
 #Ignore all model weights
 saved_model_weights/**
 
+#Ignore all logs
+logs/*

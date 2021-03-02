@@ -26,7 +26,7 @@ np.random.shuffle(pointcloud_array)
 vae = CVAE.VAE()
 vae.compile(optimizer=keras.optimizers.Adam())
 vae.save_weights(vae.checkpoint_path.format(epoch=0))
-vae.fit(pointcloud_array[:,:64,:64,:], epochs=vae.epochs, batch_size=vae.batch_size,callbacks=[vae.cp_callback])
+vae.fit(pointcloud_array[:,:64,:64,:], epochs=vae.epochs, batch_size=vae.batch_size,callbacks=[vae.cp_callback, vae.tensorboard_callback])
 
 ##Do inference to monitor results
 input_pc = np.array([pointcloud_array[0,:64,:64,:,:]])
