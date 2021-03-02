@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+#rosrun pointcloud_utils TSDF_encoder.py "./src/pointcloud_utils/saved_model_weights/26-2_13:1/0015/cp-.ckpt"
+
+
 #import tensorflow as tf 
 import sensor_msgs.point_cloud2 as pc2
 import ros_numpy as ros_np
@@ -13,25 +16,29 @@ import pickle
 import Convolutional_variational_autoencoder as CVAE
 from std_msgs.msg import Float32MultiArray
 import argparse
-
-
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+from pointcloud_utils.msg import LatSpace
 
 class unordered_pointcloud_to_latent_space():
     def __init__(self,pc_topic="/gagarin/tsdf_server/tsdf_pointcloud",lat_topic="/gagarin/pc_latent_space"):
-        #Make subscriber and publisher
-        self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_callback)
-        self.pc_pub = rospy.Publisher(lat_topic,Float32MultiArray)
 
         #Parse arguments
         self.parser = argparse.ArgumentParser(description="Model weight parser")
-        self.parser.add_argument("model_weight_dir")
+        self.parser.add_argument('model_weight_dir',type=str,help='The path for the autoencoder weights')
         self.args = self.parser.parse_args()
-        self.arg_filepath = args.model_weight_dir
+        self.arg_filepath = self.args.model_weight_dir
 
         #Load the network
         self.vae = CVAE.VAE()
-        self.vae.load_weights(arg_filepath)
-        self.latent_space_dim = 10
+        self.vae.compile(optimizer=keras.optimizers.Adam())
+        self.vae.load_weights(self.arg_filepath)
+        self.latent_space_dim = self.vae.latent_dim
+
+        #Make subscriber and publisher
+        self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_encoder_callback)
+        self.pc_pub = rospy.Publisher(lat_topic,LatSpace,queue_size=None)
 
     def point_cloud_encoder_callback(self,pc):
         #Initalize empty array for TSDF to fill
@@ -48,17 +55,16 @@ class unordered_pointcloud_to_latent_space():
         #Fill numpy array with the correct intensity value at each index
         xyzi[x_enum,y_enum,z_enum]= arr[:,3]
 
-        #Do inference
-        input_pc = np.array([xyzi])
-        latent_space = self.vae.encoder.predict(input_pc)[2]
+        #Format for TF
+        tf_input = np.reshape(xyzi[:64,:64,:],(64,64,20,1))
 
+        #Do inference
+        input_pc = np.array([tf_input])
+        latent_space = self.vae.encoder.predict(input_pc)[2].tolist()[0]
 
         #Publish the result
-        msg = Float32MultiArray()
-        msg.data = latent_space
-        msg.layout.data_offset = 0
-        msg.layout.dim = self.latent_space_dim
-        self.pc_pub.publish(latent_space)
+        msg = LatSpace(latent_space=latent_space)
+        self.pc_pub.publish(msg)
 
 
 

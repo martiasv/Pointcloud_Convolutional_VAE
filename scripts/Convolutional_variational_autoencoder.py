@@ -32,7 +32,7 @@ class VAE(keras.Model):
             name="reconstruction_loss"
         )
         self.kl_loss_tracker = keras.metrics.Mean(name="kl_loss")
-        self.checkpoint_path = "../saved_model_weights/"+ f'{datetime.now().day}-{datetime.now().month}_{datetime.now().hour}:{datetime.now().minute}' +"/{epoch:04d}/cp-.ckpt"
+        self.checkpoint_path = "../saved_model_weights/"+ f'{datetime.now().day}-{datetime.now().month}_{datetime.now().hour}:{datetime.now().minute}' +"/epoch_{epoch:04d}/cp-.ckpt"
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
         self.cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.checkpoint_path,
                                                  save_weights_only=True,

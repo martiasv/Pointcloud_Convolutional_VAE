@@ -1,0 +1,1 @@
+float32[] latent_space
