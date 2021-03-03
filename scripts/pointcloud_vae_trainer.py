@@ -6,6 +6,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 import Convolutional_variational_autoencoder as CVAE
+import argparse
 
 pointcloud_list = []
 num_batches = 3
@@ -22,9 +23,22 @@ print(pointcloud_array.shape)
 #Shuffle dataset
 np.random.shuffle(pointcloud_array)
 
-##Construct autoencoder and train
+##Construct autoencoder
 vae = CVAE.VAE()
 vae.compile(optimizer=keras.optimizers.Adam())
+
+#Load weights?
+parser = argparse.ArgumentParser(description="Model weight parser")
+parser.add_argument('model_weight_dir',type=str,help='The path for the autoencoder weights')
+args = parser.parse_args()
+arg_filepath = args.model_weight_dir
+if arg_filepath:    
+    vae.load_weights(arg_filepath)
+    print("Continuing training from previous session")
+else:
+    print("Training from scratch")
+
+#Train
 vae.save_weights(vae.checkpoint_path.format(epoch=0))
 vae.fit(pointcloud_array[:,:64,:64,:], epochs=vae.epochs, batch_size=vae.batch_size,callbacks=[vae.cp_callback, vae.tensorboard_callback])
 
