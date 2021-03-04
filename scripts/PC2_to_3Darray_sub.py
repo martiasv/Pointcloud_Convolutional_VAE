@@ -45,8 +45,8 @@ class unordered_pointcloud_to_3Darray_dataset():
         self.count +=1
         self.XYZI_pointclouds.append(xyzi)
         print(f'{self.count} pointclouds')
-        if len(self.XYZI_pointclouds)==1000:
-            with open(f'src/pointcloud_utils/pickelled/cave/pointclouds_batch{self.count//5000}.pickle', 'wb') as f:
+        if len(self.XYZI_pointclouds)%1000==0:
+            with open(f'src/pointcloud_utils/pickelled/decorated_verginia_mine/pointclouds_batch{self.count//1000}.pickle', 'wb') as f:
                 pickle.dump(self.XYZI_pointclouds, f, pickle.HIGHEST_PROTOCOL)
             print(f'Batch {self.count//1000}: Pickling complete')
             self.XYZI_pointclouds = []
