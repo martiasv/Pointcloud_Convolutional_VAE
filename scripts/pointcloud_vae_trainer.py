@@ -25,7 +25,7 @@ np.random.shuffle(pointcloud_array)
 
 ##Construct autoencoder
 vae = CVAE.VAE()
-vae.compile(optimizer=keras.optimizers.Adam())
+vae.compile(optimizer=self.optimizer)
 
 #Load weights?
 # parser = argparse.ArgumentParser(description="Model weight parser")
