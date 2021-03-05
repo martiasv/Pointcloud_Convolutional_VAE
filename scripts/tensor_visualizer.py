@@ -20,3 +20,4 @@ for im in range(pointcloud.shape[2]):
     plt.imshow(pointcloud[:,:,im], cmap="gray") 
     plt.show()
     print(np.unique(pointcloud[:,:,im])) 
+

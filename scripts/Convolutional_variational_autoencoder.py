@@ -4,6 +4,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from datetime import date, time, datetime
 import os
+import io
 
 ##Create a sampling layer
 class Sampling(layers.Layer):
@@ -21,10 +22,18 @@ class Sampling(layers.Layer):
 class VAE(keras.Model):
     def __init__(self, **kwargs):
         super(VAE, self).__init__(**kwargs)
-        self.latent_dim = latent_dim = 10
+        self.latent_dim = 10
         self.batch_size = 64
         self.epochs  = 32
-        self.save_freq = 10
+        self.activation_function = "relu"
+        self.kernel_size = 3
+        self.strides = 2
+        self.padding = "same"
+        self.encoder_conv_filters = [32,64]
+        self.encoder_dense_layers = [16]
+        self.decoder_conv_filters = [64,32,1]
+        self.decoder_dense_layers = [16*16*5*64]
+        self.save_freq = 2
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
         self.total_loss_tracker = keras.metrics.Mean(name="total_loss")
@@ -32,7 +41,8 @@ class VAE(keras.Model):
             name="reconstruction_loss"
         )
         self.kl_loss_tracker = keras.metrics.Mean(name="kl_loss")
-        self.checkpoint_path = "../saved_model_weights/"+ f'{datetime.now().day}-{datetime.now().month}_{datetime.now().hour}:{datetime.now().minute}' +"/epoch_{epoch:04d}/cp-.ckpt"
+        self.base_path = "../saved_model_weights/latent_dim_"+str(self.latent_dim)+"/"+ f'{datetime.now().day:02d}-{datetime.now().month:02d}_{datetime.now().hour:02d}:{datetime.now().minute:02d}'
+        self.checkpoint_path = self.base_path + "/epoch_{epoch:04d}/cp-.ckpt"
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
         self.cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.checkpoint_path,
                                                  save_weights_only=True,
@@ -43,10 +53,10 @@ class VAE(keras.Model):
     
     def build_encoder(self):
         encoder_inputs = keras.Input(shape=(64, 64, 20, 1))
-        x = layers.Conv3D(32, 3, activation="relu", strides=2, padding="same")(encoder_inputs)
-        x = layers.Conv3D(64, 3, activation="relu", strides=2, padding="same")(x)
+        x = layers.Conv3D(self.encoder_conv_filters[0], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(encoder_inputs)
+        x = layers.Conv3D(self.encoder_conv_filters[1], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
         x = layers.Flatten()(x)
-        x = layers.Dense(16, activation="relu")(x)
+        x = layers.Dense(self.encoder_dense_layers[0], activation=self.activation_function)(x)
         z_mean = layers.Dense(self.latent_dim, name="z_mean")(x)
         z_log_var = layers.Dense(self.latent_dim, name="z_log_var")(x)
         z = Sampling()([z_mean, z_log_var])
@@ -56,11 +66,11 @@ class VAE(keras.Model):
 
     def build_decoder(self):
         latent_inputs = keras.Input(shape=(self.latent_dim,))
-        x = layers.Dense(16*16*5*64, activation="relu")(latent_inputs)
+        x = layers.Dense(self.decoder_dense_layers[0], activation=self.activation_function)(latent_inputs)
         x = layers.Reshape((16, 16, 5, 64))(x)
-        x = layers.Conv3DTranspose(64, 3, activation="relu", strides=2, padding="same")(x)
-        x = layers.Conv3DTranspose(32, 3, activation="relu", strides=2, padding="same")(x)
-        decoder_outputs = layers.Conv3DTranspose(1, 3, activation="relu", padding="same")(x)
+        x = layers.Conv3DTranspose(self.decoder_conv_filters[0], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
+        x = layers.Conv3DTranspose(self.decoder_conv_filters[1], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
+        decoder_outputs = layers.Conv3DTranspose(self.decoder_conv_filters[2], self.kernel_size, activation=self.activation_function, padding=self.padding)(x)
         decoder = keras.Model(latent_inputs, decoder_outputs, name="decoder")
         decoder.summary()
         return decoder
@@ -95,3 +105,14 @@ class VAE(keras.Model):
             "reconstruction_loss": self.reconstruction_loss_tracker.result(),
             "kl_loss": self.kl_loss_tracker.result(),
         }
+
+
+    def write_summary_to_file(self):
+        file1 = open(self.base_path+"/network_and_training_summary.txt","w")
+        Data_to_save = f'Latent space dimension:{self.latent_dim}\nActivation function:'+self.activation_function+f'\nConvolution kernel size:{self.kernel_size}\nConvolution strides:{self.strides}\nPadding:{self.padding}\nBatch size:{self.batch_size}\nEpochs:{self.epochs}\n\nAutoencoder network summary:\nEncoder convolutional filters:{self.encoder_conv_filters}\nEncoder dense layers:{self.encoder_dense_layers}\n\nDecoder Convolutional filters:{self.decoder_conv_filters}\nDecoder dense layers:{self.decoder_dense_layers}\n'
+        stringlist = []
+        self.encoder.summary(line_length=120,print_fn=lambda x: stringlist.append(x))
+        self.decoder.summary(line_length=120,print_fn=lambda x: stringlist.append(x))
+        model_summary = "\n".join(stringlist)
+        file1.writelines(Data_to_save+model_summary)
+        file1.close()

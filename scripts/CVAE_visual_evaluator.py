@@ -9,11 +9,15 @@ import Convolutional_variational_autoencoder as CVAE
 import argparse
 
 pointcloud_list = []
-num_batches = 1
+num_batches = 1 #How many batches of the dataset to load
+test_im_index = 719 #Image to be evaluated
+
+if test_im_index > num_batches*1000:
+    print("Test_im_index higher than the number of pointclouds from the loaded batches")
 
 ##Load dataset
 for i in range(num_batches):
-    with open('../pickelled/decorated_virginia_mine/pointclouds_batch'+str(i)+'.pickle', 'rb') as f:
+    with open('../pickelled/decorated_virginia_mine/pointclouds_batch'+str(i+1)+'.pickle', 'rb') as f:
         pointcloud_list.append(np.array(pickle.load(f)))
 
 pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches,65,65,20,1))
@@ -34,14 +38,14 @@ print()
 print(pointcloud_array[0,:64,:64,0,0].shape)
 print()
 ##Do inference to monitor results
-input_pc = np.array([pointcloud_array[0,:64,:64,:,:]])
+input_pc = np.array([pointcloud_array[test_im_index,:64,:64,:,:]])
 latent_space= vae.encoder.predict(input_pc)
 print(f'Latent space z_mean: {latent_space[0]}, \n z_log_var:{latent_space[1]} \n and z: {latent_space[2]}')
 test_image = vae.decoder.predict(latent_space[2])[0,:,:,:]
 
 for im in range(test_image.shape[2]):
     f, axarr = plt.subplots(1,2)
-    axarr[0].imshow(pointcloud_array[0,:64,:64,im,0], cmap="gray")
+    axarr[0].imshow(pointcloud_array[test_im_index,:64,:64,im,0], cmap="gray")
     axarr[0].set_title('Input image')
     axarr[1].imshow(test_image[:,:,im], cmap="gray")
     axarr[1].set_title('Encoded-Decoded image')

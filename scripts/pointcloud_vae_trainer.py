@@ -40,6 +40,7 @@ vae.compile(optimizer=keras.optimizers.Adam())
 
 #Train
 vae.save_weights(vae.checkpoint_path.format(epoch=0))
+vae.write_summary_to_file()
 vae.fit(pointcloud_array[:,:64,:64,:], epochs=vae.epochs, batch_size=vae.batch_size,callbacks=[vae.cp_callback, vae.tensorboard_callback])
 
 ##Do inference to monitor results
