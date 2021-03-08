@@ -10,12 +10,16 @@ from tensorflow.keras import layers
 import Convolutional_variational_autoencoder as CVAE
 import argparse
 
+#Construct autoencoder
+vae = CVAE.VAE()
+vae.compile(optimizer=vae.optimizer)
+
 pointcloud_list = []
 num_batches = 2
 
 ##Load dataset
 for i in range(num_batches):
-    with open('../pickelled/decorated_virginia_mine/pointclouds_batch'+str(i)+'.pickle', 'rb') as f:
+    with open(vae.dataset_dir+str(i+1)+'.pickle', 'rb') as f:
         pointcloud_list.append(np.array(pickle.load(f)))
 
 pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches,65,65,20,1))
@@ -32,10 +36,6 @@ random_index = [np.random.uniform(low=0,high=1000*num_batches) for x in range(3)
 for i in range(len(random_index)):
     plt.imshow(pointcloud_array[i,:64,:64,10,0], cmap="gray") 
     plt.show()
-
-#Construct autoencoder
-vae = CVAE.VAE()
-vae.compile(optimizer=vae.optimizer)
 
 #Load weights?
 # parser = argparse.ArgumentParser(description="Model weight parser")
