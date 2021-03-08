@@ -1,6 +1,6 @@
 #Ignore all pickle files
 *.pickle
-pickelled/*
+pickelled/decorated_virginia_mine/*
 
 #Ignore all model weights
 saved_model_weights/**

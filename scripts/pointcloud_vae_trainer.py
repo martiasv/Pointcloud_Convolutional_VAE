@@ -29,7 +29,7 @@ print(pointcloud_array.shape)
 #Shuffle dataset
 np.random.shuffle(pointcloud_array)
 
-random_index = [np.random.uniform(low=0,high=1000*num_batches) for x in range(3)]
+random_index = [np.random.uniform(low=0,high=1000*num_batches) for x in range(15)]
 
 #Inspection of input data
 #for im in range(pointcloud_array.shape[2]-1):
