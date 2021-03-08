@@ -3,8 +3,6 @@ import matplotlib.pyplot as plt
 import pickle
 import sys
 
-np.set_printoptions(threshold=sys.maxsize)
-
 
 with open('../pickelled/pointclouds.pickle', 'rb') as f:
     pointcloud_array = pickle.load(f)

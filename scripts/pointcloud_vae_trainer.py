@@ -23,9 +23,17 @@ print(pointcloud_array.shape)
 #Shuffle dataset
 np.random.shuffle(pointcloud_array)
 
-##Construct autoencoder
+random_index = [np.random.uniform(low=0,high=1000*num_batches) for x in range(3)]
+
+#Inspection of input data
+#for im in range(pointcloud_array.shape[2]-1):
+for i in range(len(random_index)):
+    plt.imshow(pointcloud_array[i,:64,:64,10,0], cmap="gray") 
+    plt.show()
+
+#Construct autoencoder
 vae = CVAE.VAE()
-vae.compile(optimizer=self.optimizer)
+vae.compile(optimizer=vae.optimizer)
 
 #Load weights?
 # parser = argparse.ArgumentParser(description="Model weight parser")
