@@ -1,4 +1,6 @@
 ##Setup
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
@@ -26,7 +28,6 @@ print(pointcloud_array.shape)
 
 ##Construct autoencoder
 vae = CVAE.VAE()
-vae.compile(optimizer=keras.optimizers.Adam())
 
 #Load weights?
 parser = argparse.ArgumentParser(description="Model weight parser")

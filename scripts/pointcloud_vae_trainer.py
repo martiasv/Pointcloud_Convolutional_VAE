@@ -1,4 +1,6 @@
 ##Setup
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
