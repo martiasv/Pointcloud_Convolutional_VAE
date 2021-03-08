@@ -9,7 +9,7 @@ import Convolutional_variational_autoencoder as CVAE
 import argparse
 
 pointcloud_list = []
-num_batches = 3
+num_batches = 2
 
 ##Load dataset
 for i in range(num_batches):

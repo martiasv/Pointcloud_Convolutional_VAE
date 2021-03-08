@@ -7,3 +7,6 @@ saved_model_weights/**
 
 #Ignore all logs
 logs/*
+
+#Ignore all pycache files
+scripts/__pycache__/*
