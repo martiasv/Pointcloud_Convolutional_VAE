@@ -8,7 +8,8 @@ import numpy as np
 
 
 pointcloud_list = []
-num_batches = 3
+num_batches = 1
+names_envs = ['small_obstacles','large_obstacles','cave','tunnel']
 
 ##Load dataset
 for i in range(num_batches):
