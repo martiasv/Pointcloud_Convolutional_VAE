@@ -34,7 +34,7 @@ random_index = [np.random.uniform(low=0,high=1000*num_batches) for x in range(15
 #Inspection of input data
 #for im in range(pointcloud_array.shape[2]-1):
 for i in range(len(random_index)):
-    plt.imshow(pointcloud_array[i,:64,:64,10,0], cmap="gray") 
+    plt.imshow(pointcloud_array[i,:64,:64,8,0], cmap="gray") 
     plt.show()
 
 #Load weights?

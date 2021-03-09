@@ -46,7 +46,7 @@ class VAE(keras.Model):
         self.base_path = "../saved_model_weights/latent_dim_"+str(self.latent_dim)+"/"+ f'{datetime.now().day:02d}-{datetime.now().month:02d}_{datetime.now().hour:02d}:{datetime.now().minute:02d}'
         self.checkpoint_path = self.base_path + "/epoch_{epoch:04d}/cp-.ckpt"
         self.checkpoint_dir = os.path.dirname(self.checkpoint_path)
-        self.dataset_dir = '../pickelled/cave/pointclouds_batch'
+        self.dataset_dir = '../pickelled/tunnel/raw/pointclouds_batch'
         self.cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.checkpoint_path,
                                                  save_weights_only=True,
                                                  verbose=1,save_freq=self.save_freq*self.batch_size)
