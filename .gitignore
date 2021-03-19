@@ -3,6 +3,7 @@ pickelled/cave/**
 pickelled/small_obstacles/**
 pickelled/large_obstacles/**
 pickelled/tunnel/**
+pickelled/large_obstacle_tunnel/**
 
 #Ignore all model weights
 saved_model_weights/**

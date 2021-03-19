@@ -11,18 +11,18 @@ import Convolutional_variational_autoencoder as CVAE
 import argparse
 
 pointcloud_list = []
-num_batches = 1 #How many batches of the dataset to load
-test_im_index = 719 #Image to be evaluated
-
-if test_im_index > num_batches*1000:
-    print("Test_im_index higher than the number of pointclouds from the loaded batches")
+#num_batches = 1 #How many batches of the dataset to load
+#test_im_index = 719 #Image to be evaluated
+test_images_indices = [0,8,14,19]
+#if test_im_index > num_batches*1000:
+#   print("Test_im_index higher than the number of pointclouds from the loaded batches")
 
 ##Load dataset
-for i in range(num_batches):
-    with open('../pickelled/decorated_virginia_mine/pointclouds_batch'+str(i+1)+'.pickle', 'rb') as f:
-        pointcloud_list.append(np.array(pickle.load(f)))
+#for i in range(num_batches):
+with open('../pickelled/test_set_4envs/test_set_4envs.pickle', 'rb') as f:
+    pointcloud_list.append(np.array(pickle.load(f)))
 
-pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches,65,65,20,1))
+pointcloud_array = np.reshape(pointcloud_list,(20,65,65,20,1))
 
 print(pointcloud_array.shape)
 
@@ -35,33 +35,26 @@ parser.add_argument('model_weight_dir',type=str,help='The path for the autoencod
 args = parser.parse_args()
 arg_filepath = args.model_weight_dir
 vae.load_weights(arg_filepath)
-print()
-print(pointcloud_array[0,:64,:64,0,0].shape)
-print()
+
+output_images = []
+
 ##Do inference to monitor results
-input_pc = np.array([pointcloud_array[test_im_index,:64,:64,:,:]])
-latent_space= vae.encoder.predict(input_pc)
-print(f'Latent space z_mean: {latent_space[0]}, \n z_log_var:{latent_space[1]} \n and z: {latent_space[2]}')
-test_image = vae.decoder.predict(latent_space[2])[0,:,:,:]
+for i in range(20):
+    input_pc = np.array([pointcloud_array[i,:64,:64,:,:]])
+    latent_space= vae.encoder.predict(input_pc)
+    output_images.append(vae.decoder.predict(latent_space[2])[0,:,:,:])
 
-for im in range(test_image.shape[2]):
+output_images = np.array(output_images)
+
+for indx in test_images_indices:
+    #for im in range(20):
     f, axarr = plt.subplots(1,2)
-    axarr[0].imshow(pointcloud_array[test_im_index,:64,:64,im,0], cmap="gray")
+    axarr[0].imshow(pointcloud_array[indx,:64,:64,8,0], cmap="gray")
     axarr[0].set_title('Input image')
-    axarr[1].imshow(test_image[:,:,im], cmap="gray")
+    axarr[1].imshow(output_images[indx,:,:,8,0], cmap="gray")
     axarr[1].set_title('Encoded-Decoded image')
-    plt.show()
+    #f.suptitle(f'In', fontsize=12)
+    f.savefig(f'../eval_images/Latent_dim_{vae.latent_dim}_test_ind_{indx}_8.eps')
+        
 
 
-
-
-# fig = plt.figure()
-# ax = fig.add_subplot(1, 2, 1)
-# imgplot = plt.imshow(lum_img)
-# ax.set_title('Before')
-# plt.colorbar(ticks=[0.1, 0.3, 0.5, 0.7], orientation='horizontal')
-# ax = fig.add_subplot(1, 2, 2)
-# imgplot = plt.imshow(lum_img)
-# imgplot.set_clim(0.0, 0.7)
-# ax.set_title('After')
-# plt.colorbar(ticks=[0.1, 0.3, 0.5, 0.7], orientation='horizontal')

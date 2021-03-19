@@ -9,11 +9,11 @@ from random import randrange
 
 pointcloud_list = []
 num_batches = 4
-names_envs = ['small_obstacles','large_obstacles','cave','tunnel']
+names_envs = ['large_obstacle_tunnel','large_obstacles','cave','tunnel']
 
 ##Load dataset
 for name in names_envs:
-    with open('../pickelled/' +name + '/shuffled/'+name+'_pointclouds_batch0.pickle', 'rb') as f:
+    with open('../pickelled/' +name + '/shuffled/pointclouds_batch1.pickle', 'rb') as f:
         pointcloud_list.append(np.array(pickle.load(f)))
 
 pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches,65,65,20,1))

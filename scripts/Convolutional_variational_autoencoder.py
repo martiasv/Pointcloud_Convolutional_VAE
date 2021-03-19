@@ -22,16 +22,16 @@ class Sampling(layers.Layer):
 class VAE(keras.Model):
     def __init__(self, **kwargs):
         super(VAE, self).__init__(**kwargs)
-        self.latent_dim = 10
+        self.latent_dim = 20
         self.batch_size = 64
         self.epochs  = 32
         self.activation_function = "relu"
         self.kernel_size = 3
         self.strides = 2
         self.padding = "same"
-        self.encoder_conv_filters = [32,64]
-        self.encoder_dense_layers = [16]
-        self.decoder_conv_filters = [64,32,1]
+        self.encoder_conv_filters = [16,32,64]
+        self.encoder_dense_layers = [64]
+        self.decoder_conv_filters = [64,32,16,1]
         self.decoder_dense_layers = [16*16*5*64]
         self.save_freq = 2
         self.encoder = self.build_encoder()
