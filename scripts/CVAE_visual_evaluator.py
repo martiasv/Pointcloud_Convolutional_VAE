@@ -24,6 +24,14 @@ with open('../pickelled/test_set_4envs/test_set_4envs.pickle', 'rb') as f:
 
 pointcloud_array = np.reshape(pointcloud_list,(20,65,65,20,1))
 
+#Need to reshape array for compatibility with triple conv encoder
+new_pc_array = np.zeros((20,65,65,24,1))
+new_pc_array[:,:,:,:20,:] = pointcloud_array
+pointcloud_array = new_pc_array
+
+#Clear from memory
+del new_pc_array
+
 print(pointcloud_array.shape)
 
 ##Construct autoencoder

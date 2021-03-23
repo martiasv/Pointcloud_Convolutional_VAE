@@ -23,6 +23,7 @@ class VAE(keras.Model):
     def __init__(self, **kwargs):
         super(VAE, self).__init__(**kwargs)
         self.latent_dim = 20
+        #self.tensor_input_shape = (64, 64, 24, 1)
         self.batch_size = 64
         self.epochs  = 32
         self.activation_function = "relu"
@@ -32,7 +33,7 @@ class VAE(keras.Model):
         self.encoder_conv_filters = [16,32,64]
         self.encoder_dense_layers = [64]
         self.decoder_conv_filters = [64,32,16,1]
-        self.decoder_dense_layers = [16*16*5*64]
+        self.decoder_dense_layers = [8*8*3*64]
         self.save_freq = 2
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
@@ -55,11 +56,11 @@ class VAE(keras.Model):
 
     
     def build_encoder(self):
-        encoder_inputs = keras.Input(shape=(64, 64, 20, 1))
+        encoder_inputs = keras.Input(shape=(64, 64, 24, 1))
         x = layers.Conv3D(self.encoder_conv_filters[0], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(encoder_inputs)
         x = layers.Conv3D(self.encoder_conv_filters[1], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
+        x = layers.Conv3D(self.encoder_conv_filters[2], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
         x = layers.Flatten()(x)
-        x = layers.Dense(self.encoder_dense_layers[0], activation=self.activation_function)(x)
         z_mean = layers.Dense(self.latent_dim, name="z_mean")(x)
         z_log_var = layers.Dense(self.latent_dim, name="z_log_var")(x)
         z = Sampling()([z_mean, z_log_var])
@@ -70,10 +71,11 @@ class VAE(keras.Model):
     def build_decoder(self):
         latent_inputs = keras.Input(shape=(self.latent_dim,))
         x = layers.Dense(self.decoder_dense_layers[0], activation=self.activation_function)(latent_inputs)
-        x = layers.Reshape((16, 16, 5, 64))(x)
+        x = layers.Reshape((8, 8, 3, 64))(x)
         x = layers.Conv3DTranspose(self.decoder_conv_filters[0], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
         x = layers.Conv3DTranspose(self.decoder_conv_filters[1], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
-        decoder_outputs = layers.Conv3DTranspose(self.decoder_conv_filters[2], self.kernel_size, activation=self.activation_function, padding=self.padding)(x)
+        x = layers.Conv3DTranspose(self.decoder_conv_filters[2], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
+        decoder_outputs = layers.Conv3DTranspose(self.decoder_conv_filters[3], self.kernel_size, activation=self.activation_function, padding=self.padding)(x)
         decoder = keras.Model(latent_inputs, decoder_outputs, name="decoder")
         decoder.summary()
         return decoder

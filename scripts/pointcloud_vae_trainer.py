@@ -1,6 +1,4 @@
 ##Setup
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,14 +13,24 @@ vae = CVAE.VAE()
 vae.compile(optimizer=vae.optimizer)
 
 pointcloud_list = []
-num_batches = 2
+num_batches = 1
+envs = ['cave','large_obstacle_tunnel','tunnel','large_obstacles']
 
 ##Load dataset
-for i in range(num_batches):
-    with open(vae.dataset_dir+str(i+1)+'.pickle', 'rb') as f:
-        pointcloud_list.append(np.array(pickle.load(f)))
+for env in envs:
+    for i in range(num_batches):
+        with open("../pickelled/"+env+"/shuffled/pointclouds_batch"+str(i+1)+'.pickle', 'rb') as f:
+            pointcloud_list.append(np.array(pickle.load(f)))
 
-pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches,65,65,20,1))
+pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches*len(envs),65,65,20,1))
+
+#Need to reshape array for compatibility with triple conv encoder
+new_pc_array = np.zeros((1000*num_batches*len(envs),65,65,24,1))
+new_pc_array[:,:,:,:20,:] = pointcloud_array
+pointcloud_array = new_pc_array
+
+#Clear from memory
+del new_pc_array
 
 print(pointcloud_array.shape)
 
