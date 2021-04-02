@@ -38,7 +38,7 @@ class unordered_pointcloud_to_latent_space():
 
         #Make subscriber and publisher
         self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_encoder_callback)
-        self.pc_pub = rospy.Publisher(lat_topic,PointCloud2,queue_size=None)
+        self.pc_pub = rospy.Publisher(lat_topic,PointCloud2,queue_size=1)
 
     def point_cloud_encoder_callback(self,pc):
         #Initalize empty array for TSDF to fill
@@ -87,6 +87,7 @@ class unordered_pointcloud_to_latent_space():
         #Publish the result
         msg = output_pc
         self.pc_pub.publish(msg)
+        rospy.loginfo("Published Encoded-Decoded pointcloud", *args, **kwargs)
 
 
 
