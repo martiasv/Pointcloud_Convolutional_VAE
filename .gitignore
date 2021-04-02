@@ -14,6 +14,7 @@ logs/**
 
 #Ignore all pycache files
 scripts/__pycache__/**
+scripts/__pycache__/*
 
 #Ignore eval images
 eval_images/**
