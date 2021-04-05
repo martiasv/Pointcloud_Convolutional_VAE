@@ -78,19 +78,12 @@ class unordered_pointcloud_to_latent_space():
         #Convert output image to record array
         output_image = np.reshape(output_image,(64,64,24))
         m,n,l = output_image.shape
-        R,C,T = np.mgrid[:m,:n,:l]
-        #output_record_array = np.column_stack((C.ravel(),R.ravel(),T.ravel(), output_image.ravel()))
+        R,C,T = np.mgrid[:m,:n,:l]*scale_factor
 
-        # #Scale XYZ to match the correct dimensions
-        # output_record_array[:,:3] = output_record_array[:,:3]*scale_factor
-
-        # #Shift to match centers
-        # #Shift X-Y
-        # output_record_array[:,:1] = output_record_array[:,:1]-(scale_factor*32)
-
-        # #Shift Z
-        # output_record_array[:,2] = output_record_array[:,2]-(scale_factor*10)
-        # print(output_record_array.shape)
+        #Shift points to that the origin matches
+        R = R - (scale_factor*32)
+        C = C - (scale_factor*32)
+        T = T - (scale_factor*10)
 
         #Create fields
         fields = [PointField('x', 0, PointField.FLOAT32, 1),
@@ -104,7 +97,7 @@ class unordered_pointcloud_to_latent_space():
         header.stamp = rospy.Time.now()
 
         #Create the points
-        points = np.array([C.ravel(),R.ravel(),T.ravel(),output_image.ravel()]).reshape(4,-1).T
+        points = np.array([R.ravel(),C.ravel(),T.ravel(),output_image.ravel()]).reshape(4,-1).T
 
         #Create the PointCloud2
         output_pc = pc2.create_cloud(header,fields,points)
