@@ -20,7 +20,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 from pointcloud_utils.msg import LatSpace
-from stf_msgs.msg import Header
+from std_msgs.msg import Header
 from sensor_msgs.msg import PointField
 
 class unordered_pointcloud_to_latent_space():
@@ -79,30 +79,20 @@ class unordered_pointcloud_to_latent_space():
         output_image = np.reshape(output_image,(64,64,24))
         m,n,l = output_image.shape
         R,C,T = np.mgrid[:m,:n,:l]
-        output_record_array = np.column_stack((C.ravel(),R.ravel(),T.ravel(), output_image.ravel()))
+        #output_record_array = np.column_stack((C.ravel(),R.ravel(),T.ravel(), output_image.ravel()))
 
-        #Scale XYZ to match the correct dimensions
-        output_record_array[:,:3] = output_record_array[:,:3]*scale_factor
+        # #Scale XYZ to match the correct dimensions
+        # output_record_array[:,:3] = output_record_array[:,:3]*scale_factor
 
-        #Shift to match centers
-        #Shift X-Y
-        output_record_array[:,:1] = output_record_array[:,:1]-(scale_factor*32)
+        # #Shift to match centers
+        # #Shift X-Y
+        # output_record_array[:,:1] = output_record_array[:,:1]-(scale_factor*32)
 
-        #Shift Z
-        output_record_array[:,2] = output_record_array[:,2]-(scale_factor*10)
-        print(output_record_array.shape)
+        # #Shift Z
+        # output_record_array[:,2] = output_record_array[:,2]-(scale_factor*10)
+        # print(output_record_array.shape)
 
-        #Convert record array to PointCloud2
-        output_record_array = np.core.records.fromarrays(output_record_array.transpose())
-        #output_image = np.recarray(output_image)
-        print(type(output_record_array))
-        print(output_record_array.shape)
-        print(type(output_record_array[0]))
-        print(output_record_array[0])
-        output_pc = ros_np.point_cloud2.array_to_pointcloud2(output_record_array,stamp=rospy.Time.now() ,frame_id="gagarin/base_link")
-        print(type(output_pc))
-
-        #create fields
+        #Create fields
         fields = [PointField('x', 0, PointField.FLOAT32, 1),
                 PointField('y', 4, PointField.FLOAT32, 1),
                 PointField('z', 8, PointField.FLOAT32, 1),
@@ -112,6 +102,12 @@ class unordered_pointcloud_to_latent_space():
         header = Header()
         header.frame_id = "gagarin/base_link"
         header.stamp = rospy.Time.now()
+
+        #Create the points
+        points = np.array([C.ravel(),R.ravel(),T.ravel(),output_image.ravel()]).reshape(4,-1).T
+
+        #Create the PointCloud2
+        output_pc = pc2.create_cloud(header,fields,points)
 
         self.pc_pub.publish(output_pc)
         rospy.loginfo("Published Encoded-Decoded pointcloud")
