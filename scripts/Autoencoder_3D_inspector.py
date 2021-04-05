@@ -1,29 +1,21 @@
 #!/usr/bin/env python
 
-#rosrun pointcloud_utils TSDF_encoder.py "./src/pointcloud_utils/saved_model_weights/26-2_13:1/0015/cp-.ckpt"
+#rosrun pointcloud_utils Autoencoder_3D_inspector.py src/pointcloud_utils/saved_model_weights/latent_dim_30/24-03_10:44/epoch_0031/cp-.ckpt
 
-
-#import tensorflow as tf 
-import sensor_msgs.point_cloud2 as pc2
-import ros_numpy as ros_np
-from sensor_msgs.msg import PointCloud2
 import rospy
 import numpy as np
-import time
-from datetime import timedelta
-import matplotlib.pyplot as plt
-import pickle
-import Convolutional_variational_autoencoder as CVAE
-from std_msgs.msg import Float32MultiArray
+import ros_numpy as ros_np
 import argparse
+import sensor_msgs.point_cloud2 as pc2
+from sensor_msgs.msg import PointField
+from sensor_msgs.msg import PointCloud2
+from std_msgs.msg import Header
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-from pointcloud_utils.msg import LatSpace
-from std_msgs.msg import Header
-from sensor_msgs.msg import PointField
+import Convolutional_variational_autoencoder as CVAE
 
-class unordered_pointcloud_to_latent_space():
+class autoencoder_pc_reconstruction():
     def __init__(self,pc_topic="/gagarin/tsdf_server/tsdf_pointcloud",recon_pc="/gagarin/reconstructed_pc"):
 
         #Parse arguments
@@ -45,14 +37,10 @@ class unordered_pointcloud_to_latent_space():
     def point_cloud_encoder_callback(self,pc):
         #Initalize empty array for TSDF to fill
         xyzi = np.zeros((65,65,24))
-        print(type(ros_np.point_cloud2.pointcloud2_to_array(pc)))
-        print(ros_np.point_cloud2.pointcloud2_to_array(pc).shape)
-        print(type(ros_np.point_cloud2.pointcloud2_to_array(pc)[0]))
-        print(ros_np.point_cloud2.pointcloud2_to_array(pc)[0])
+
         #Convert from pointcloud2 to numpy array
         arr = np.array(ros_np.point_cloud2.pointcloud2_to_array(pc).tolist())
-        print(type(arr))
-        print(arr.shape)
+
         #Convert from decimal position values, to enumerated index values
         x_unique,x_enum = np.unique(arr[:,0],return_inverse= True)
         _,y_enum = np.unique(arr[:,1],return_inverse= True)
@@ -69,11 +57,8 @@ class unordered_pointcloud_to_latent_space():
 
         #Do inference
         input_pc = np.array([tf_input])
-        print(f'Input shape: {input_pc.shape}')
         latent_space = self.vae.encoder.predict(input_pc)
-        #print(f'Latent shape: {latent_space.shape}')
         output_image = self.vae.decoder.predict(latent_space[2])[0,:,:,:]
-        print(f'Output shape: {output_image.shape}')
 
         #Convert output image to record array
         output_image = np.reshape(output_image,(64,64,24))
@@ -102,17 +87,14 @@ class unordered_pointcloud_to_latent_space():
         #Create the PointCloud2
         output_pc = pc2.create_cloud(header,fields,points)
 
+        #Publish pointcloud
         self.pc_pub.publish(output_pc)
         rospy.loginfo("Published Encoded-Decoded pointcloud")
 
-
-
 def main():
     rospy.init_node('PC2_encoder')
-    pc_saver = unordered_pointcloud_to_latent_space()
+    pc_saver = autoencoder_pc_reconstruction()
     rospy.spin()
-
-
 
 if __name__ == '__main__':
     main()

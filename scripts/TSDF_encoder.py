@@ -42,7 +42,7 @@ class unordered_pointcloud_to_latent_space():
 
     def point_cloud_encoder_callback(self,pc):
         #Initalize empty array for TSDF to fill
-        xyzi = np.zeros((65,65,20))
+        xyzi = np.zeros((65,65,24))
 
         #Convert from pointcloud2 to numpy array
         arr = np.array(ros_np.point_cloud2.pointcloud2_to_array(pc).tolist())
@@ -56,7 +56,7 @@ class unordered_pointcloud_to_latent_space():
         xyzi[x_enum,y_enum,z_enum]= arr[:,3]
 
         #Format for TF
-        tf_input = np.reshape(xyzi[:64,:64,:],(64,64,20,1))
+        tf_input = np.reshape(xyzi[:64,:64,:],(64,64,24,1))
 
         #Do inference
         input_pc = np.array([tf_input])
