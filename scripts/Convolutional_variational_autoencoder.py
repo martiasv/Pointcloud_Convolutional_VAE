@@ -35,8 +35,12 @@ class VAE(keras.Model):
         self.decoder_conv_filters = [64,32]
         self.decoder_dense_layers = [8*8*3*64]
         self.save_freq = 2
+        self.output_threshold =  0.2 #Anything above this value will be automatically set to 0.4. -0.4 -> 0.4
+        self.min_val = -0.4
+        self.max_val = 0.4
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
+        self.loss_function = keras.losses.mean_squared_error
         self.total_loss_tracker = keras.metrics.Mean(name="total_loss")
         self.reconstruction_loss_tracker = keras.metrics.Mean(
             name="reconstruction_loss"
@@ -53,6 +57,9 @@ class VAE(keras.Model):
                                                  verbose=1,save_freq=self.save_freq*self.batch_size)
         self.logdir = "../logs/latent_dim_"+str(self.latent_dim)+"/"+ f'{datetime.now().day:02d}-{datetime.now().month:02d}_{datetime.now().hour:02d}:{datetime.now().minute:02d}'
         self.tensorboard_callback = keras.callbacks.TensorBoard(log_dir=self.logdir)
+
+    def thresholding_layer(self,x):
+        return keras.backend.clip(x,self.min_val,self.output_threshold)
 
     
     def build_encoder(self):
@@ -77,7 +84,8 @@ class VAE(keras.Model):
         x = layers.UpSampling3D(size=(2,2,2))(x)
         for idx in range(len(self.decoder_conv_filters)):
             x = layers.Conv3DTranspose(self.decoder_conv_filters[idx], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
-        decoder_outputs = layers.Conv3DTranspose(1, self.kernel_size, activation=self.activation_function, padding=self.padding)(x)
+        x = layers.Conv3DTranspose(1, self.kernel_size, activation=self.activation_function, padding=self.padding)(x) #Stride 1 for collapsing into correct dimensions
+        decoder_outputs = layers.Lambda(self.thresholding_layer)(x)
         decoder = keras.Model(latent_inputs, decoder_outputs, name="decoder")
         decoder.summary()
         return decoder
@@ -96,7 +104,7 @@ class VAE(keras.Model):
             reconstruction = self.decoder(z)
             reconstruction_loss = tf.reduce_mean(
                 tf.reduce_sum(
-                    keras.losses.mean_squared_error(data, reconstruction), axis=(1, 2)
+                    self.loss_function(data, reconstruction), axis=(1, 2)
                 )
             )
             kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
@@ -116,7 +124,7 @@ class VAE(keras.Model):
 
     def write_summary_to_file(self):
         file1 = open(self.base_path+"/network_and_training_summary.txt","w")
-        Data_to_save = f'Latent space dimension:{self.latent_dim}\nActivation function:'+self.activation_function+f'\nConvolution kernel size:{self.kernel_size}\nConvolution strides:{self.strides}\nPadding:{self.padding}\nBatch size:{self.batch_size}\nEpochs:{self.epochs}\nOptimizer:{type(self.optimizer)}\nLearning rate:{self.learning_rate}\nDataset dir:{self.dataset_dir}\n\nAutoencoder network summary:\nEncoder convolutional filters:{self.encoder_conv_filters}\nEncoder dense layers:{self.encoder_dense_layers}\n\nDecoder Convolutional filters:{self.decoder_conv_filters}\nDecoder dense layers:{self.decoder_dense_layers}\n'
+        Data_to_save = f'Latent space dimension:{self.latent_dim}\nActivation function:'+self.activation_function+f'\nConvolution kernel size:{self.kernel_size}\nConvolution strides:{self.strides}\nPadding:{self.padding}\nBatch size:{self.batch_size}\nEpochs:{self.epochs}\nOptimizer:{type(self.optimizer)}\nLearning rate:{self.learning_rate}\nThreshold for output:{self.output_threshold}\nLoss function: {self.loss_function}\nDataset dir:{self.dataset_dir}\n\nAutoencoder network summary:\nEncoder convolutional filters:{self.encoder_conv_filters}\nEncoder dense layers:{self.encoder_dense_layers}\n\nDecoder Convolutional filters:{self.decoder_conv_filters}\nDecoder dense layers:{self.decoder_dense_layers}\n'
         stringlist = []
         self.encoder.summary(line_length=120,print_fn=lambda x: stringlist.append(x))
         self.decoder.summary(line_length=120,print_fn=lambda x: stringlist.append(x))
