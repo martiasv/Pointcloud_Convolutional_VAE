@@ -20,9 +20,11 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 from pointcloud_utils.msg import LatSpace
+from stf_msgs.msg import Header
+from sensor_msgs.msg import PointField
 
 class unordered_pointcloud_to_latent_space():
-    def __init__(self,pc_topic="/gagarin/tsdf_server/tsdf_pointcloud",lat_topic="/gagarin/pc_latent_space"):
+    def __init__(self,pc_topic="/gagarin/tsdf_server/tsdf_pointcloud",recon_pc="/gagarin/reconstructed_pc"):
 
         #Parse arguments
         self.parser = argparse.ArgumentParser(description="Model weight parser")
@@ -38,15 +40,19 @@ class unordered_pointcloud_to_latent_space():
 
         #Make subscriber and publisher
         self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_encoder_callback)
-        self.pc_pub = rospy.Publisher(lat_topic,PointCloud2,queue_size=1)
+        self.pc_pub = rospy.Publisher(recon_pc,PointCloud2,queue_size=1)
 
     def point_cloud_encoder_callback(self,pc):
         #Initalize empty array for TSDF to fill
-        xyzi = np.zeros((65,65,20))
-
+        xyzi = np.zeros((65,65,24))
+        print(type(ros_np.point_cloud2.pointcloud2_to_array(pc)))
+        print(ros_np.point_cloud2.pointcloud2_to_array(pc).shape)
+        print(type(ros_np.point_cloud2.pointcloud2_to_array(pc)[0]))
+        print(ros_np.point_cloud2.pointcloud2_to_array(pc)[0])
         #Convert from pointcloud2 to numpy array
         arr = np.array(ros_np.point_cloud2.pointcloud2_to_array(pc).tolist())
-
+        print(type(arr))
+        print(arr.shape)
         #Convert from decimal position values, to enumerated index values
         x_unique,x_enum = np.unique(arr[:,0],return_inverse= True)
         _,y_enum = np.unique(arr[:,1],return_inverse= True)
@@ -59,20 +65,24 @@ class unordered_pointcloud_to_latent_space():
         xyzi[x_enum,y_enum,z_enum]= arr[:,3]
 
         #Format for TF
-        tf_input = np.reshape(xyzi[:64,:64,:],(64,64,20,1))
+        tf_input = np.reshape(xyzi[:64,:64,:],(64,64,24,1))
 
         #Do inference
         input_pc = np.array([tf_input])
+        print(f'Input shape: {input_pc.shape}')
         latent_space = self.vae.encoder.predict(input_pc)
-        output_image = vae.decoder.predict(latent_space[2])[0,:,:,:]
+        #print(f'Latent shape: {latent_space.shape}')
+        output_image = self.vae.decoder.predict(latent_space[2])[0,:,:,:]
+        print(f'Output shape: {output_image.shape}')
 
         #Convert output image to record array
+        output_image = np.reshape(output_image,(64,64,24))
         m,n,l = output_image.shape
         R,C,T = np.mgrid[:m,:n,:l]
         output_record_array = np.column_stack((C.ravel(),R.ravel(),T.ravel(), output_image.ravel()))
 
         #Scale XYZ to match the correct dimensions
-        output_record_array[:,:2] = output_record_array[:,:2]*scale_factor
+        output_record_array[:,:3] = output_record_array[:,:3]*scale_factor
 
         #Shift to match centers
         #Shift X-Y
@@ -80,14 +90,31 @@ class unordered_pointcloud_to_latent_space():
 
         #Shift Z
         output_record_array[:,2] = output_record_array[:,2]-(scale_factor*10)
+        print(output_record_array.shape)
 
         #Convert record array to PointCloud2
-        output_pc = ros_np.point_cloud2.array_to_pointcloud2(output_record_array)
+        output_record_array = np.core.records.fromarrays(output_record_array.transpose())
+        #output_image = np.recarray(output_image)
+        print(type(output_record_array))
+        print(output_record_array.shape)
+        print(type(output_record_array[0]))
+        print(output_record_array[0])
+        output_pc = ros_np.point_cloud2.array_to_pointcloud2(output_record_array,stamp=rospy.Time.now() ,frame_id="gagarin/base_link")
+        print(type(output_pc))
 
-        #Publish the result
-        msg = output_pc
-        self.pc_pub.publish(msg)
-        rospy.loginfo("Published Encoded-Decoded pointcloud", *args, **kwargs)
+        #create fields
+        fields = [PointField('x', 0, PointField.FLOAT32, 1),
+                PointField('y', 4, PointField.FLOAT32, 1),
+                PointField('z', 8, PointField.FLOAT32, 1),
+                PointField('intensity', 12, PointField.FLOAT32, 1)]
+
+        #Create the header
+        header = Header()
+        header.frame_id = "gagarin/base_link"
+        header.stamp = rospy.Time.now()
+
+        self.pc_pub.publish(output_pc)
+        rospy.loginfo("Published Encoded-Decoded pointcloud")
 
 
 
