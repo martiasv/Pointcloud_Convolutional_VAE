@@ -27,6 +27,7 @@ class VAE(keras.Model):
         self.batch_size = 64
         self.epochs  = 32
         self.activation_function = "relu"
+        self.output_activation_function = "linear"
         self.kernel_size = 3
         self.strides = 2
         self.padding = "same"
@@ -84,7 +85,7 @@ class VAE(keras.Model):
         x = layers.UpSampling3D(size=(2,2,2))(x)
         for idx in range(len(self.decoder_conv_filters)):
             x = layers.Conv3DTranspose(self.decoder_conv_filters[idx], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
-        x = layers.Conv3DTranspose(1, self.kernel_size, activation=self.activation_function, padding=self.padding)(x) #Stride 1 for collapsing into correct dimensions
+        x = layers.Conv3DTranspose(1, self.kernel_size, activation=self.output_activation_function, padding=self.padding)(x) #Stride 1 for collapsing into correct dimensions
         decoder_outputs = layers.Lambda(self.thresholding_layer)(x)
         decoder = keras.Model(latent_inputs, decoder_outputs, name="decoder")
         decoder.summary()
