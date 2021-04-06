@@ -14,7 +14,7 @@ vae.compile(optimizer=vae.optimizer)
 
 pointcloud_list = []
 num_batches = 1
-envs = ['cave','large_obstacle_tunnel','tunnel','large_obstacles']
+envs = ['cave','large_obstacle_tunnel']#,'tunnel','large_obstacles']
 
 ##Load dataset
 for env in envs:

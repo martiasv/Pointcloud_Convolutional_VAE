@@ -59,7 +59,7 @@ class VAE(keras.Model):
         self.tensorboard_callback = keras.callbacks.TensorBoard(log_dir=self.logdir)
 
     def thresholding_layer(self,x):
-        return keras.backend.clip(x,self.min_val,self.output_threshold)
+        return tf.where(tf.greater(x,tf.ones(tf.shape(x))*self.output_threshold),tf.ones(tf.shape(x))*self.max_val,x)
 
     
     def build_encoder(self):
