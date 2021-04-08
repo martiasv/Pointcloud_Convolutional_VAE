@@ -22,21 +22,21 @@ class Sampling(layers.Layer):
 class VAE(keras.Model):
     def __init__(self, **kwargs):
         super(VAE, self).__init__(**kwargs)
-        self.latent_dim = 30
+        self.latent_dim = 100
         #self.tensor_input_shape = (64, 64, 24, 1)
         self.batch_size = 64
         self.epochs  = 32
         self.activation_function = "relu"
-        self.output_activation_function = "linear"
+        self.output_activation_function = "tanh"
         self.kernel_size = 3
         self.strides = 2
         self.padding = "same"
         self.encoder_conv_filters = [32,64]
-        self.encoder_dense_layers = [64]
+        self.encoder_dense_layers = [256]
         self.decoder_conv_filters = [64,32]
         self.decoder_dense_layers = [8*8*3*64]
         self.save_freq = 2
-        self.output_threshold =  0.2 #Anything above this value will be automatically set to 0.4. -0.4 -> 0.4
+        self.output_threshold =  0.3 #Anything above this value will be automatically set to 0.4. -0.4 -> 0.4
         self.min_val = -0.4
         self.max_val = 0.4
         self.encoder = self.build_encoder()
@@ -62,6 +62,8 @@ class VAE(keras.Model):
     def thresholding_layer(self,x):
         return tf.where(tf.greater(x,tf.ones(tf.shape(x))*self.output_threshold),tf.ones(tf.shape(x))*self.max_val,x)
 
+    def multiply_layer(self,x):
+        return x*0.4
     
     def build_encoder(self):
         encoder_inputs = keras.Input(shape=(64, 64, 24, 1))
@@ -86,7 +88,8 @@ class VAE(keras.Model):
         for idx in range(len(self.decoder_conv_filters)):
             x = layers.Conv3DTranspose(self.decoder_conv_filters[idx], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
         x = layers.Conv3DTranspose(1, self.kernel_size, activation=self.output_activation_function, padding=self.padding)(x) #Stride 1 for collapsing into correct dimensions
-        decoder_outputs = layers.Lambda(self.thresholding_layer)(x)
+        x = layers.Lambda(self.multiply_layer)(x) #Tanh function normalizes between -1 and 1. We want the output to be between -0.4 and 0.4, so we multiply after the tanh operation
+        decoder_outputs = layers.Lambda(self.thresholding_layer)(x) #Thresholds all values over a certain value to ensure that the training focuses on the shapes of objects
         decoder = keras.Model(latent_inputs, decoder_outputs, name="decoder")
         decoder.summary()
         return decoder
