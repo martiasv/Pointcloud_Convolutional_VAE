@@ -5,6 +5,7 @@ from tensorflow.keras import layers
 from datetime import date, time, datetime
 import os
 import io
+import math
 
 ##Create a sampling layer
 class Sampling(layers.Layer):
@@ -20,7 +21,7 @@ class Sampling(layers.Layer):
 
 ##Define the VAE as a model with a custom train_step
 class VAE(keras.Model):
-    def __init__(self, **kwargs):
+    def __init__(self, dataset_size, **kwargs):
         super(VAE, self).__init__(**kwargs)
         self.latent_dim = 100
         #self.tensor_input_shape = (64, 64, 24, 1)
@@ -35,7 +36,9 @@ class VAE(keras.Model):
         self.encoder_dense_layers = [256]
         self.decoder_conv_filters = [64,32]
         self.decoder_dense_layers = [8*8*3*64]
-        self.save_freq = 2
+        self.save_freq = 8 #Save after this many epochs
+        self.dataset_size = dataset_size
+        self.batch_count = math.ceil(self.dataset_size/self.batch_size)
         self.output_threshold =  0.3 #Anything above this value will be automatically set to 0.4. -0.4 -> 0.4
         self.min_val = -0.4
         self.max_val = 0.4
@@ -55,12 +58,15 @@ class VAE(keras.Model):
         self.dataset_dir = '../pickelled/tunnel/shuffled/pointclouds_batch'
         self.cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.checkpoint_path,
                                                  save_weights_only=True,
-                                                 verbose=1,save_freq=self.save_freq*self.batch_size)
+                                                 verbose=1,save_freq=self.save_freq*self.batch_count)
         self.logdir = "../logs/latent_dim_"+str(self.latent_dim)+"/"+ f'{datetime.now().day:02d}-{datetime.now().month:02d}_{datetime.now().hour:02d}:{datetime.now().minute:02d}'
         self.tensorboard_callback = keras.callbacks.TensorBoard(log_dir=self.logdir)
 
     def thresholding_layer(self,x):
         return tf.where(tf.greater(x,tf.ones(tf.shape(x))*self.output_threshold),tf.ones(tf.shape(x))*self.max_val,x)
+
+    def set_batch_count(self,count):
+        self.batch_count = count 
 
     def multiply_layer(self,x):
         return x*0.4

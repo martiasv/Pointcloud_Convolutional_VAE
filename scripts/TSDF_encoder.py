@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-#rosrun pointcloud_utils TSDF_encoder.py "./src/pointcloud_utils/saved_model_weights/26-2_13:1/0015/cp-.ckpt"
+#   <!-- TSDF_encoder -->
+#   <node name="TSDF_encoder" pkg="pointcloud_utils" type="TSDF_encoder.py" output="screen">
+#     <param name="reconstruct_TSDF" value="false"/>
+#     <param name="model_weight_path" value="$(find pointcloud_utils)/saved_model_weights/latent_dim_100/08-04_16_05/epoch_0055/cp-.ckpt"/>
+#    </node>
 
-
-#import tensorflow as tf 
 import sensor_msgs.point_cloud2 as pc2
 import ros_numpy as ros_np
 from sensor_msgs.msg import PointCloud2
