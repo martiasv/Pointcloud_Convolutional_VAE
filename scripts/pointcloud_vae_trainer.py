@@ -20,7 +20,9 @@ envs = ['cave','tunnel','test_corridor']#,'tunnel','large_obstacles']
 for env in envs:
     for i in range(num_batches):
         with open("../pickelled/"+env+"/shuffled/pointclouds_batch"+str(i+1)+'.pickle', 'rb') as f:
-            pointcloud_list.append(np.array(pickle.load(f)))
+            array = np.array(pickle.load(f))
+            print(f'Env {env} batch {i} shape: {array.shape}')
+            pointcloud_list.append(array)
 
 pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches*len(envs),65,65,20,1))
 

@@ -60,7 +60,7 @@ class unordered_pointcloud_to_latent_space():
 
         #Do inference
         input_pc = np.array([tf_input])
-        latent_space = self.vae.encoder.predict(input_pc)[2].tolist()[0]
+        latent_space = self.vae.encoder.predict(input_pc)[0].tolist()[0]
 
         #Publish the result
         msg = LatSpace(latent_space=latent_space)

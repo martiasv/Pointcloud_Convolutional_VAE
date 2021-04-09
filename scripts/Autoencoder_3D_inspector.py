@@ -58,16 +58,17 @@ class autoencoder_pc_reconstruction():
         #Do inference
         input_pc = np.array([tf_input])
         latent_space = self.vae.encoder.predict(input_pc)
-        output_image = self.vae.decoder.predict(latent_space[2])[0,:,:,:]
+        output_image = self.vae.decoder.predict(latent_space[0])[0,:,:,:]
 
-        #Convert output image to record array
+        #Convert output image to list of points
         output_image = np.reshape(output_image,(64,64,24))
-        m,n,l = output_image.shape
+        cropped_output_image = output_image[:54,:54,:16]
+        m,n,l = cropped_output_image.shape
         R,C,T = np.mgrid[:m,:n,:l]*scale_factor
 
         #Shift points to that the origin matches
-        R = R - (scale_factor*32)
-        C = C - (scale_factor*32)
+        R = R - (scale_factor*27)
+        C = C - (scale_factor*27)
         T = T - (scale_factor*10)
 
         #Create fields
@@ -82,7 +83,7 @@ class autoencoder_pc_reconstruction():
         header.stamp = rospy.Time.now()
 
         #Create the points
-        points = np.array([R.ravel(),C.ravel(),T.ravel(),output_image.ravel()]).reshape(4,-1).T
+        points = np.array([R.ravel(),C.ravel(),T.ravel(),cropped_output_image.ravel()]).reshape(4,-1).T
 
         #Create the PointCloud2
         output_pc = pc2.create_cloud(header,fields,points)
