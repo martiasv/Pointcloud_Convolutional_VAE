@@ -21,7 +21,7 @@ class Sampling(layers.Layer):
 
 ##Define the VAE as a model with a custom train_step
 class VAE(keras.Model):
-    def __init__(self, dataset_size, **kwargs):
+    def __init__(self, dataset_size=20, **kwargs):
         super(VAE, self).__init__(**kwargs)
         self.latent_dim = 100
         #self.tensor_input_shape = (64, 64, 24, 1)
@@ -35,7 +35,7 @@ class VAE(keras.Model):
         self.encoder_conv_filters = [32,64]
         self.encoder_dense_layers = [256]
         self.decoder_conv_filters = [64,32]
-        self.decoder_dense_layers = [8*8*3*64]
+        self.decoder_dense_layers = [256,8*8*3*64]
         self.save_freq = 8 #Save after this many epochs
         self.dataset_size = dataset_size
         self.batch_count = math.ceil(self.dataset_size/self.batch_size)
@@ -89,6 +89,7 @@ class VAE(keras.Model):
     def build_decoder(self):
         latent_inputs = keras.Input(shape=(self.latent_dim,))
         x = layers.Dense(self.decoder_dense_layers[0], activation=self.activation_function)(latent_inputs)
+        x = layers.Dense(self.decoder_dense_layers[1], activation=self.activation_function)(x)
         x = layers.Reshape((8, 8, 3, 64))(x)
         x = layers.UpSampling3D(size=(2,2,2))(x)
         for idx in range(len(self.decoder_conv_filters)):
