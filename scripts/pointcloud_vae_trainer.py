@@ -7,10 +7,9 @@ from tensorflow import keras
 from tensorflow.keras import layers
 import Convolutional_variational_autoencoder as CVAE
 import argparse
+import math
 
-#Construct autoencoder
-vae = CVAE.VAE()
-vae.compile(optimizer=vae.optimizer)
+
 
 pointcloud_list = []
 num_batches = 4
@@ -19,9 +18,9 @@ envs = ['cave','tunnel','test_corridor']#,'tunnel','large_obstacles']
 ##Load dataset
 for env in envs:
     for i in range(num_batches):
-        with open("../pickelled/"+env+"/pointclouds_batch"+str(i+1)+'.pickle', 'rb') as f:
+        with open("../pickelled/"+env+"/shuffled/pointclouds_batch"+str(i+1)+'.pickle', 'rb') as f:
             array = np.array(pickle.load(f))
-            print(f"Pointcloud {env} batch {i} size {array.shape}")
+            print(f'Env {env} batch {i} shape: {array.shape}')
             pointcloud_list.append(array)
 
 pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches*len(envs),65,65,20,1))
@@ -35,6 +34,12 @@ pointcloud_array = new_pc_array
 del new_pc_array
 
 print(pointcloud_array.shape)
+
+#Construct autoencoder
+vae = CVAE.VAE(dataset_size= pointcloud_array.shape[0]) #Set the correct batch count for saving frequency
+vae.compile(optimizer=vae.optimizer)
+
+print(vae.batch_count)
 
 #Shuffle dataset
 np.random.shuffle(pointcloud_array)
