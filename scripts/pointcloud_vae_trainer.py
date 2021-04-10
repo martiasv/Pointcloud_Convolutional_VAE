@@ -13,14 +13,16 @@ vae = CVAE.VAE()
 vae.compile(optimizer=vae.optimizer)
 
 pointcloud_list = []
-num_batches = 1
+num_batches = 4
 envs = ['cave','tunnel','test_corridor']#,'tunnel','large_obstacles']
 
 ##Load dataset
 for env in envs:
     for i in range(num_batches):
-        with open("../pickelled/"+env+"/shuffled/pointclouds_batch"+str(i+1)+'.pickle', 'rb') as f:
-            pointcloud_list.append(np.array(pickle.load(f)))
+        with open("../pickelled/"+env+"/pointclouds_batch"+str(i+1)+'.pickle', 'rb') as f:
+            array = np.array(pickle.load(f))
+            print(f"Pointcloud {env} batch {i} size {array.shape}")
+            pointcloud_list.append(array)
 
 pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches*len(envs),65,65,20,1))
 

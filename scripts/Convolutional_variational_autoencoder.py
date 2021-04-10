@@ -24,8 +24,8 @@ class VAE(keras.Model):
         super(VAE, self).__init__(**kwargs)
         self.latent_dim = 100
         #self.tensor_input_shape = (64, 64, 24, 1)
-        self.batch_size = 64
-        self.epochs  = 32
+        self.batch_size = 256
+        self.epochs  = 64
         self.activation_function = "relu"
         self.output_activation_function = "tanh"
         self.kernel_size = 3
