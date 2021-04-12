@@ -130,7 +130,9 @@ class unordered_pointcloud_to_latent_space():
             rospy.loginfo("Published Encoded-Decoded pointcloud")
 
             if self.pub_slice == True:
-                image_temp  = CvBridge().cv2_to_imgmsg(cropped_output_image[:,:,8])
+                #Flip image to match flying direction
+                flipped_output_image = np.flip(np.flip(cropped_output_image[:,:,8],axis=1),axis=0)
+                image_temp  = CvBridge().cv2_to_imgmsg(flipped_output_image)
                 image_temp.header = header
                 self.slice_pub.publish(image_temp)
                 rospy.loginfo("Published Encoded-Decoded image slice")
