@@ -23,7 +23,7 @@ class Sampling(layers.Layer):
 class VAE(keras.Model):
     def __init__(self, dataset_size=20, **kwargs):
         super(VAE, self).__init__(**kwargs)
-        self.latent_dim = 100
+        self.latent_dim = 10
         #self.tensor_input_shape = (64, 64, 24, 1)
         self.batch_size = 64
         self.epochs  = 32
@@ -38,18 +38,20 @@ class VAE(keras.Model):
         self.decoder_dense_layers = [256,8*8*3*64]
         self.save_freq = 8 #Save after this many epochs
         self.dataset_size = dataset_size
-        self.batch_count = math.ceil(self.dataset_size/self.batch_size)
+        self.validation_split = 0.2
+        self.batch_count = math.ceil((self.dataset_size*(1-self.validation_split))/self.batch_size)
         self.output_threshold =  0.3 #Anything above this value will be automatically set to 0.4. -0.4 -> 0.4
         self.min_val = -0.4
         self.max_val = 0.4
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
+
+        #Define training loss functions
         self.loss_function = keras.losses.mean_squared_error
         self.total_loss_tracker = keras.metrics.Mean(name="total_loss")
-        self.reconstruction_loss_tracker = keras.metrics.Mean(
-            name="reconstruction_loss"
-        )
+        self.reconstruction_loss_tracker = keras.metrics.Mean(name="reconstruction_loss")
         self.kl_loss_tracker = keras.metrics.Mean(name="kl_loss")
+
         self.learning_rate = 0.001
         self.optimizer = keras.optimizers.Adam(learning_rate=self.learning_rate)
         self.base_path = "../saved_model_weights/latent_dim_"+str(self.latent_dim)+"/"+ f'{datetime.now().day:02d}-{datetime.now().month:02d}_{datetime.now().hour:02d}:{datetime.now().minute:02d}'
@@ -131,7 +133,22 @@ class VAE(keras.Model):
             "reconstruction_loss": self.reconstruction_loss_tracker.result(),
             "kl_loss": self.kl_loss_tracker.result(),
         }
+    def call(self,data):
+        z_mean, z_log_var, z = self.encoder(data)
+        return self.decoder(z_mean)
 
+    def test_step(self,data):
+        z_mean, z_log_var, z = self.encoder(data)
+        reconstruction = self.decoder(z)
+        reconstruction_loss = tf.reduce_mean(
+            tf.reduce_sum(
+                self.loss_function(data, reconstruction), axis=(1, 2)
+            )
+        )
+        kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
+        kl_loss = tf.reduce_mean(tf.reduce_sum(kl_loss, axis=1))
+        total_loss = reconstruction_loss + kl_loss
+        return {"loss":total_loss,"reconstruction_loss":reconstruction_loss,"kl_loss":kl_loss}
 
     def write_summary_to_file(self):
         file1 = open(self.base_path+"/network_and_training_summary.txt","w")
