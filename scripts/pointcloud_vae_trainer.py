@@ -6,13 +6,14 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 import Convolutional_variational_autoencoder as CVAE
+import Minimal_convolutional_variational_autoencoder as MCVAE
 import argparse
 import math
 
 
 pointcloud_list = []
 num_batches = 1
-envs = ['cave']#,'tunnel']#,'test_corridor']#,'tunnel','large_obstacles']
+envs = ['cave','tunnel','test_corridor','randomized']#,'tunnel','large_obstacles']
 
 ##Load dataset
 for env in envs:
@@ -26,7 +27,7 @@ pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches*len(envs),65,65,
 
 
 #Need to reshape array for compatibility with triple conv encoder
-new_pc_array = np.zeros((1000*num_batches*len(envs),65,65,24,1))
+new_pc_array = np.zeros((1000*num_batches*len(envs),65,65,32,1))
 new_pc_array[:,:,:,:20,:] = pointcloud_array
 pointcloud_array = new_pc_array
 
@@ -36,7 +37,7 @@ del new_pc_array
 print(pointcloud_array.shape)
 
 #Construct autoencoder
-vae = CVAE.VAE(dataset_size= pointcloud_array.shape[0]) #Set the correct batch count for saving frequency
+vae = MCVAE.VAE(dataset_size= pointcloud_array.shape[0]) #Set the correct batch count for saving frequency
 vae.compile(optimizer=vae.optimizer)
 
 print(vae.batch_count)
