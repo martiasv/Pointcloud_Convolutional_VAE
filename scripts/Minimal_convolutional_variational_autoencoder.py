@@ -6,6 +6,7 @@ from datetime import date, time, datetime
 import os
 import io
 import math
+from scipy import signal, ndimage
 
 ##Create a sampling layer
 class Sampling(layers.Layer):
@@ -24,6 +25,7 @@ class VAE(keras.Model):
     def __init__(self, dataset_size=20, **kwargs):
         super(VAE, self).__init__(**kwargs)
         self.latent_dim = 30
+        self.blurring_kernel = np.ones((3,3,3))
         #self.tensor_input_shape = (64, 64, 24, 1)
         self.batch_size = 64
         self.epochs  = 32
@@ -118,6 +120,8 @@ class VAE(keras.Model):
         ]
 
     def train_step(self, data):
+        gaussian_filtered_data = signal.convolve(data,self.blurring_kernel,mode="same")
+        edge_detection_data = ndimage.sobel(gaussian_filtered_data,mode="reflect")
         with tf.GradientTape() as tape:
             z_mean, z_log_var, z = self.encoder(data)
             reconstruction = self.decoder(z)
@@ -125,7 +129,7 @@ class VAE(keras.Model):
                 tf.reduce_sum(
                     self.loss_function(data, reconstruction), axis=(1, 2)
                 )
-            )
+            ) #+ add term for gaussian filtered edge detection, 
             kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
             kl_loss = tf.reduce_mean(tf.reduce_sum(kl_loss, axis=1))
             total_loss = reconstruction_loss + kl_loss
@@ -144,11 +148,13 @@ class VAE(keras.Model):
         return self.decoder(z_mean)
 
     def test_step(self,data):
+        gaussian_filtered_data = signal.convolve(data,self.blurring_kernel,mode="same")
+        edge_detection_data = ndimage.sobel(gaussian_filtered_data,mode="reflect")
         z_mean, z_log_var, z = self.encoder(data)
         reconstruction = self.decoder(z)
         reconstruction_loss = tf.reduce_mean(
             tf.reduce_sum(
-                self.loss_function(data, reconstruction), axis=(1, 2)
+                self.loss_function(edge_detection_data, reconstruction), axis=(1, 2)
             )
         )
         kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))

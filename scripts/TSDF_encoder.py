@@ -19,6 +19,7 @@ from datetime import timedelta
 import matplotlib.pyplot as plt
 import pickle
 import Convolutional_variational_autoencoder as CVAE
+import Minimal_convolutional_variational_autoencoder as MCVAE
 from std_msgs.msg import Float32MultiArray
 from std_msgs.msg import Header
 import argparse
@@ -38,7 +39,7 @@ class unordered_pointcloud_to_latent_space():
         print('__file__:    ', __file__)
 
         #Load the network
-        self.vae = CVAE.VAE()
+        self.vae = MCVAE.VAE()
         self.vae.compile(optimizer=keras.optimizers.Adam())
         self.vae.load_weights(self.arg_filepath)
         self.latent_space_dim = self.vae.latent_dim
@@ -64,7 +65,7 @@ class unordered_pointcloud_to_latent_space():
 
     def point_cloud_encoder_callback(self,pc):
         #Initalize empty array for TSDF to fill
-        xyzi = np.zeros((65,65,24))
+        xyzi = np.zeros((65,65,32))
 
         #Convert from pointcloud2 to numpy array
         arr = np.array(ros_np.point_cloud2.pointcloud2_to_array(pc).tolist())
@@ -78,7 +79,7 @@ class unordered_pointcloud_to_latent_space():
         xyzi[x_enum,y_enum,z_enum]= arr[:,3]
 
         #Format for TF
-        tf_input = np.reshape(xyzi[:64,:64,:],(64,64,24,1))
+        tf_input = np.reshape(xyzi[:64,:64,:],(64,64,32,1))
 
         #Do inference
         input_pc = np.array([tf_input])
@@ -98,7 +99,7 @@ class unordered_pointcloud_to_latent_space():
             scale_factor = np.abs(x_unique[0]-x_unique[1])
 
             #Convert output image to list of points
-            output_image = np.reshape(output_image,(64,64,24))
+            output_image = np.reshape(output_image,(64,64,32))
             cropped_output_image = output_image[:54,:54,:16]
             m,n,l = cropped_output_image.shape
             R,C,T = np.mgrid[:m,:n,:l]*scale_factor
