@@ -12,8 +12,9 @@ import math
 
 
 pointcloud_list = []
-num_batches = 1
-envs = ['cave','tunnel','test_corridor','randomized']#,'tunnel','large_obstacles']
+num_batches = 4
+#envs = ['cave','tunnel','test_corridor']#,'randomized']#,'tunnel','large_obstacles']
+envs = ['test_corridor_yawless']
 
 ##Load dataset
 for env in envs:

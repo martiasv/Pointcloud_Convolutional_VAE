@@ -7,6 +7,7 @@ import os
 import io
 import math
 from scipy import signal, ndimage
+import matplotlib.pyplot as plt
 
 ##Create a sampling layer
 class Sampling(layers.Layer):
@@ -25,7 +26,7 @@ class VAE(keras.Model):
     def __init__(self, dataset_size=20, **kwargs):
         super(VAE, self).__init__(**kwargs)
         self.latent_dim = 30
-        self.blurring_kernel = np.ones((3,3,3))
+        self.blurring_kernel = np.ones((3,3,3,1,1))
         #self.tensor_input_shape = (64, 64, 24, 1)
         self.batch_size = 64
         self.epochs  = 32
@@ -35,14 +36,14 @@ class VAE(keras.Model):
         self.strides = 2
         self.padding = "same"
         self.encoder_conv_filters = [8,16]
-        self.encoder_dense_layers = [64,64]
+        self.encoder_dense_layers = [128,64]
         self.decoder_conv_filters = [16,8]
-        self.decoder_dense_layers = [64,64,4*4*2*16]
+        self.decoder_dense_layers = [64,128,8*8*4*16]
         self.save_freq = 8 #Save after this many epochs
         self.dataset_size = dataset_size
         self.validation_split = 0.2
         self.batch_count = math.ceil((self.dataset_size*(1-self.validation_split))/self.batch_size)
-        self.output_threshold =  0.3 #Anything above this value will be automatically set to 0.4. -0.4 -> 0.4
+        self.output_threshold =  0.4 #Anything above this value will be automatically set to 0.4. -0.4 -> 0.4
         self.min_val = -0.4
         self.max_val = 0.4
         self.encoder = self.build_encoder()
@@ -80,7 +81,7 @@ class VAE(keras.Model):
         x = encoder_inputs
         #for idx in range(len(self.encoder_conv_filters)):
         x = layers.Conv3D(self.encoder_conv_filters[0], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
-        x = layers.MaxPooling3D(pool_size=(2,2,2))(x)
+        #x = layers.MaxPooling3D(pool_size=(2,2,2))(x)
         x = layers.Conv3D(self.encoder_conv_filters[1], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
         x = layers.MaxPooling3D(pool_size=(2,2,2))(x)
         x = layers.Flatten()(x)
@@ -98,11 +99,11 @@ class VAE(keras.Model):
         x = layers.Dense(self.decoder_dense_layers[0], activation=self.activation_function)(latent_inputs)
         x = layers.Dense(self.decoder_dense_layers[1], activation=self.activation_function)(x)
         x = layers.Dense(self.decoder_dense_layers[2], activation=self.activation_function)(x)
-        x = layers.Reshape((4, 4, 2, 16))(x)
+        x = layers.Reshape((8, 8, 4, 16))(x)
         x = layers.UpSampling3D(size=(2,2,2))(x)
         #for idx in range(len(self.decoder_conv_filters)):
         x = layers.Conv3DTranspose(self.decoder_conv_filters[0], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
-        x = layers.UpSampling3D(size=(2,2,2))(x)
+        #x = layers.UpSampling3D(size=(2,2,2))(x)
         x = layers.Conv3DTranspose(self.decoder_conv_filters[1], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
         x = layers.Conv3DTranspose(1, self.kernel_size, activation=self.output_activation_function, padding=self.padding)(x) #Stride 1 for collapsing into correct dimensions
         decoder_outputs = layers.Lambda(self.multiply_layer)(x) #Tanh function normalizes between -1 and 1. We want the output to be between -0.4 and 0.4, so we multiply after the tanh operation
@@ -120,8 +121,18 @@ class VAE(keras.Model):
         ]
 
     def train_step(self, data):
-        gaussian_filtered_data = signal.convolve(data,self.blurring_kernel,mode="same")
-        edge_detection_data = ndimage.sobel(gaussian_filtered_data,mode="reflect")
+        #print(type(data))
+        #box_filtered = tf.nn.conv3d(data,self.blurring_kernel,[1,1,1,1,1],padding='SAME')
+        #edge_detected = self.sobel_edge_3d(data)
+        #Inspect original image
+        # plt.imshow(data[0,:,:,8,0],cmap="gray")
+        # plt.show()
+
+        #Inspect edge detected image
+        # plt.imshow(edge_detected[0,:,:,8,0], cmap="gray") 
+        # plt.show()
+        #gaussian_filtered_data = signal.convolve(np.array(data),self.blurring_kernel,mode="same")
+        #edge_detection_data = ndimage.sobel(gaussian_filtered_data,mode="reflect")
         with tf.GradientTape() as tape:
             z_mean, z_log_var, z = self.encoder(data)
             reconstruction = self.decoder(z)
@@ -148,13 +159,17 @@ class VAE(keras.Model):
         return self.decoder(z_mean)
 
     def test_step(self,data):
-        gaussian_filtered_data = signal.convolve(data,self.blurring_kernel,mode="same")
-        edge_detection_data = ndimage.sobel(gaussian_filtered_data,mode="reflect")
+        #box_filtered = tf.nn.conv3d(data,self.blurring_kernel,[1,1,1,1,1],padding='SAME')
+        #edge_detected = self.sobel_edge_3d(data)
+
+
+        # gaussian_filtered_data = signal.convolve(np.array(data),self.blurring_kernel,mode="same")
+        # edge_detection_data = ndimage.sobel(gaussian_filtered_data,mode="reflect")
         z_mean, z_log_var, z = self.encoder(data)
         reconstruction = self.decoder(z)
         reconstruction_loss = tf.reduce_mean(
             tf.reduce_sum(
-                self.loss_function(edge_detection_data, reconstruction), axis=(1, 2)
+                self.loss_function(data, reconstruction), axis=(1, 2)
             )
         )
         kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
@@ -171,3 +186,34 @@ class VAE(keras.Model):
         model_summary = "\n".join(stringlist)
         file1.writelines(Data_to_save+model_summary)
         file1.close()
+
+    def sobel_edge_3d(self,inputTensor):
+        # This function computes Sobel edge maps on 3D images
+        # inputTensor: input 3D images, with size of [batchsize,W,H,D,1]
+        # output: output 3D edge maps, with size of [batchsize,W-2,H-2,D-2,3], each channel represents edge map in one dimension
+        sobel1 = tf.constant([0.1,0,-0.1],tf.float32) # 1D edge filter
+        sobel2 = tf.constant([0.1,0.2,0.1],tf.float32) # 1D blur weight
+        
+        # generate sobel1 and sobel2 on x- y- and z-axis, saved in sobel1xyz and sobel2xyz
+        sobel1xyz = [sobel1,sobel1,sobel1]
+        sobel2xyz = [sobel2,sobel2,sobel2]
+        for xyz in range(3):
+            newShape = [1,1,1,1,1]
+            newShape[xyz] = 3
+            sobel1xyz[xyz] = tf.reshape(sobel1,newShape)
+            sobel2xyz[xyz] = tf.reshape(sobel2,newShape)
+            
+        # outputTensor_x will be the Sobel edge map in x-axis
+        outputTensor_x = tf.nn.conv3d(inputTensor,sobel1xyz[0],strides=[1,1,1,1,1],padding='SAME') # edge filter in x-axis
+        outputTensor_x = tf.nn.conv3d(outputTensor_x,sobel2xyz[1],strides=[1,1,1,1,1],padding='SAME') # blur filter in y-axis
+        outputTensor_x = tf.nn.conv3d(outputTensor_x,sobel2xyz[2],strides=[1,1,1,1,1],padding='SAME') # blur filter in z-axis
+        
+        outputTensor_y = tf.nn.conv3d(inputTensor,sobel1xyz[1],strides=[1,1,1,1,1],padding='SAME')
+        outputTensor_y = tf.nn.conv3d(outputTensor_y,sobel2xyz[0],strides=[1,1,1,1,1],padding='SAME')
+        outputTensor_y = tf.nn.conv3d(outputTensor_y,sobel2xyz[2],strides=[1,1,1,1,1],padding='SAME')
+        
+        outputTensor_z = tf.nn.conv3d(inputTensor,sobel1xyz[2],strides=[1,1,1,1,1],padding='SAME')
+        outputTensor_z = tf.nn.conv3d(outputTensor_z,sobel2xyz[0],strides=[1,1,1,1,1],padding='SAME')
+        outputTensor_z = tf.nn.conv3d(outputTensor_z,sobel2xyz[1],strides=[1,1,1,1,1],padding='SAME')
+        
+        return tf.concat([outputTensor_x,outputTensor_y,outputTensor_z],4)
