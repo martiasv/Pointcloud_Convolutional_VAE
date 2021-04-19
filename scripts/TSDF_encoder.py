@@ -61,6 +61,8 @@ class unordered_pointcloud_to_latent_space():
         else:
             self.pub_slice = False
 
+        self.bin_thresh = rospy.get_param("~binarization_threshold")
+
 
 
     def point_cloud_encoder_callback(self,pc):
@@ -78,8 +80,11 @@ class unordered_pointcloud_to_latent_space():
         #Fill numpy array with the correct intensity value at each index
         xyzi[x_enum,y_enum,z_enum]= arr[:,3]
 
+        #Threshold the input image
+        binarized = np.where(xyzi > self.bin_thresh, 1,0)
+
         #Format for TF
-        tf_input = np.reshape(xyzi[:64,:64,:],(64,64,32,1))
+        tf_input = np.reshape(binarized[:64,:64,:],(64,64,32,1))
 
         #Do inference
         input_pc = np.array([tf_input])

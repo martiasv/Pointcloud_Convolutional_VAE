@@ -25,6 +25,6 @@ np.random.shuffle(pointcloud_array)
 
 print(f'Pickling shuffled pointclouds')
 for i in range(num_batches):
-    with open(f'../pickelled/test_corridor_yawless|/shuffled/pointclouds_batch{i+1}.pickle', 'wb') as f:
+    with open(f'../pickelled/test_corridor_yawless/shuffled/pointclouds_batch{i+1}.pickle', 'wb') as f:
         pickle.dump(pointcloud_array[i*1000:(i+1)*1000,:,:,:], f, pickle.HIGHEST_PROTOCOL)
     print(f'Batch {i+1}: Pickling complete')

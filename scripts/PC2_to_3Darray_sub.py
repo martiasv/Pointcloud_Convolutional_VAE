@@ -18,6 +18,7 @@ class unordered_pointcloud_to_3Darray_dataset():
         self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_callback)
         self.XYZI_pointclouds = []
         self.count = 0
+        self.bin_thresh = 0.1
 
     def point_cloud_callback(self,pc):
         #Loop 1 is slow
@@ -37,6 +38,9 @@ class unordered_pointcloud_to_3Darray_dataset():
         start_time_3 = time.monotonic()
         xyzi[x_enum,y_enum,z_enum]= arr[:,3]
         end_time_3 = time.monotonic()
+
+        #Threshold the input image
+        xyzi = np.where(xyzi > self.bin_thresh, 1,0)
 
         # print(f'Execution time 1 [ms]:{timedelta(seconds = end_time_1 - start_time_1).microseconds/1000}')
         # print(f'Execution time 2 [ms]:{timedelta(seconds = end_time_2 - start_time_2).microseconds/1000}')
