@@ -18,6 +18,7 @@ class unordered_pointcloud_to_3Darray_dataset():
         self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_callback)
         self.XYZI_pointclouds = []
         self.count = 0
+        self.bin_thresh = 0.1
 
     def point_cloud_callback(self,pc):
         #Loop 1 is slow
@@ -38,6 +39,9 @@ class unordered_pointcloud_to_3Darray_dataset():
         xyzi[x_enum,y_enum,z_enum]= arr[:,3]
         end_time_3 = time.monotonic()
 
+        #Threshold the input image
+        xyzi = np.where(xyzi > self.bin_thresh, 1,0)
+
         # print(f'Execution time 1 [ms]:{timedelta(seconds = end_time_1 - start_time_1).microseconds/1000}')
         # print(f'Execution time 2 [ms]:{timedelta(seconds = end_time_2 - start_time_2).microseconds/1000}')
         # print(f'Execution time 3 [ms]:{timedelta(seconds = end_time_3 - start_time_3).microseconds/1000}')
@@ -46,7 +50,7 @@ class unordered_pointcloud_to_3Darray_dataset():
         self.XYZI_pointclouds.append(xyzi)
         print(f'{self.count} pointclouds')
         if len(self.XYZI_pointclouds)%1000==0:
-            with open(f'src/pointcloud_utils/pickelled/test_corridor/raw/pointclouds_batch{self.count//1000}.pickle', 'wb') as f:
+            with open(f'src/pointcloud_utils/pickelled/test_corridor_yawless_spawn/raw/pointclouds_batch{self.count//1000}.pickle', 'wb') as f:
                 pickle.dump(self.XYZI_pointclouds, f, pickle.HIGHEST_PROTOCOL)
             print(f'Batch {self.count//1000}: Pickling complete')
             self.XYZI_pointclouds = []

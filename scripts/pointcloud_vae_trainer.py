@@ -6,14 +6,15 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 import Convolutional_variational_autoencoder as CVAE
+import Minimal_convolutional_variational_autoencoder as MCVAE
 import argparse
 import math
 
 
-
 pointcloud_list = []
 num_batches = 4
-envs = ['cave','tunnel','test_corridor']#,'tunnel','large_obstacles']
+#envs = ['cave','tunnel','test_corridor']#,'randomized']#,'tunnel','large_obstacles']
+envs = ['test_corridor_yawless']
 
 ##Load dataset
 for env in envs:
@@ -25,8 +26,9 @@ for env in envs:
 
 pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches*len(envs),65,65,20,1))
 
+
 #Need to reshape array for compatibility with triple conv encoder
-new_pc_array = np.zeros((1000*num_batches*len(envs),65,65,24,1))
+new_pc_array = np.zeros((1000*num_batches*len(envs),65,65,32,1))
 new_pc_array[:,:,:,:20,:] = pointcloud_array
 pointcloud_array = new_pc_array
 
@@ -36,7 +38,7 @@ del new_pc_array
 print(pointcloud_array.shape)
 
 #Construct autoencoder
-vae = CVAE.VAE(dataset_size= pointcloud_array.shape[0]) #Set the correct batch count for saving frequency
+vae = MCVAE.VAE(dataset_size= pointcloud_array.shape[0]) #Set the correct batch count for saving frequency
 vae.compile(optimizer=vae.optimizer)
 
 print(vae.batch_count)
@@ -51,21 +53,11 @@ for i in range(len(random_index)):
     plt.imshow(pointcloud_array[i,:64,:64,8,0], cmap="gray") 
     plt.show()
 
-#Load weights?
-# parser = argparse.ArgumentParser(description="Model weight parser")
-# parser.add_argument('model_weight_dir',type=str,help='The path for the autoencoder weights')
-# args = parser.parse_args()
-# arg_filepath = args.model_weight_dir
-# if arg_filepath:    
-#     vae.load_weights(arg_filepath)
-#     print("Continuing training from previous session")
-# else:
-#     print("Training from scratch")
 
 #Train
 vae.save_weights(vae.checkpoint_path.format(epoch=0))
 vae.write_summary_to_file()
-vae.fit(pointcloud_array[:,:64,:64,:], epochs=vae.epochs, batch_size=vae.batch_size,callbacks=[vae.cp_callback, vae.tensorboard_callback])
+vae.fit(pointcloud_array[:,:64,:64,:],validation_split=vae.validation_split, epochs=vae.epochs, batch_size=vae.batch_size,callbacks=[vae.cp_callback, vae.tensorboard_callback])
 
 ##Do inference to monitor results
 input_pc = np.array([pointcloud_array[0,:64,:64,:,:]])
