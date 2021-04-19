@@ -28,7 +28,7 @@ class VAE(keras.Model):
         self.batch_size = 64
         self.epochs  = 32
         self.activation_function = "relu"
-        self.output_activation_function = "tanh"
+        self.output_activation_function = "sigmoid"
         self.kernel_size = 3
         self.strides = 2
         self.padding = "same"
@@ -40,14 +40,11 @@ class VAE(keras.Model):
         self.dataset_size = dataset_size
         self.validation_split = 0.2
         self.batch_count = math.ceil((self.dataset_size*(1-self.validation_split))/self.batch_size)
-        self.output_threshold =  0.3 #Anything above this value will be automatically set to 0.4. -0.4 -> 0.4
-        self.min_val = -0.4
-        self.max_val = 0.4
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
 
         #Define training loss functions
-        self.loss_function = keras.losses.mean_squared_error
+        self.loss_function = keras.losses.BinaryCrossentropy
         self.total_loss_tracker = keras.metrics.Mean(name="total_loss")
         self.reconstruction_loss_tracker = keras.metrics.Mean(name="reconstruction_loss")
         self.kl_loss_tracker = keras.metrics.Mean(name="kl_loss")
@@ -64,14 +61,8 @@ class VAE(keras.Model):
         self.logdir = "../logs/latent_dim_"+str(self.latent_dim)+"/"+ f'{datetime.now().day:02d}-{datetime.now().month:02d}_{datetime.now().hour:02d}:{datetime.now().minute:02d}'
         self.tensorboard_callback = keras.callbacks.TensorBoard(log_dir=self.logdir)
 
-    def thresholding_layer(self,x):
-        return tf.where(tf.greater(x,tf.ones(tf.shape(x))*self.output_threshold),tf.ones(tf.shape(x))*self.max_val,x)
-
     def set_batch_count(self,count):
         self.batch_count = count 
-
-    def multiply_layer(self,x):
-        return x*0.4
     
     def build_encoder(self):
         encoder_inputs = keras.Input(shape=(64, 64, 24, 1))
@@ -96,9 +87,7 @@ class VAE(keras.Model):
         x = layers.UpSampling3D(size=(2,2,2))(x)
         for idx in range(len(self.decoder_conv_filters)):
             x = layers.Conv3DTranspose(self.decoder_conv_filters[idx], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
-        x = layers.Conv3DTranspose(1, self.kernel_size, activation=self.output_activation_function, padding=self.padding)(x) #Stride 1 for collapsing into correct dimensions
-        x = layers.Lambda(self.multiply_layer)(x) #Tanh function normalizes between -1 and 1. We want the output to be between -0.4 and 0.4, so we multiply after the tanh operation
-        decoder_outputs = layers.Lambda(self.thresholding_layer)(x) #Thresholds all values over a certain value to ensure that the training focuses on the shapes of objects
+        decoder_outputs = layers.Conv3DTranspose(1, self.kernel_size, activation=self.output_activation_function, padding=self.padding)(x) #Stride 1 for collapsing into correct dimensions
         decoder = keras.Model(latent_inputs, decoder_outputs, name="decoder")
         decoder.summary()
         return decoder

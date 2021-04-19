@@ -31,7 +31,7 @@ class VAE(keras.Model):
         self.batch_size = 64
         self.epochs  = 32
         self.activation_function = "relu"
-        self.output_activation_function = "tanh"
+        self.output_activation_function = "sigmoid"
         self.kernel_size = 3
         self.strides = 2
         self.padding = "same"
@@ -43,14 +43,11 @@ class VAE(keras.Model):
         self.dataset_size = dataset_size
         self.validation_split = 0.2
         self.batch_count = math.ceil((self.dataset_size*(1-self.validation_split))/self.batch_size)
-        self.output_threshold =  0.4 #Anything above this value will be automatically set to 0.4. -0.4 -> 0.4
-        self.min_val = -0.4
-        self.max_val = 0.4
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
 
         #Define training loss functions
-        self.loss_function = keras.losses.mean_squared_error
+        self.loss_function = keras.losses.BinaryCrossentropy
         self.total_loss_tracker = keras.metrics.Mean(name="total_loss")
         self.reconstruction_loss_tracker = keras.metrics.Mean(name="reconstruction_loss")
         self.kl_loss_tracker = keras.metrics.Mean(name="kl_loss")
@@ -67,14 +64,9 @@ class VAE(keras.Model):
         self.logdir = "../logs/latent_dim_"+str(self.latent_dim)+"/"+ f'{datetime.now().day:02d}-{datetime.now().month:02d}_{datetime.now().hour:02d}:{datetime.now().minute:02d}'
         self.tensorboard_callback = keras.callbacks.TensorBoard(log_dir=self.logdir)
 
-    def thresholding_layer(self,x):
-        return tf.where(tf.greater(x,tf.ones(tf.shape(x))*self.output_threshold),tf.ones(tf.shape(x))*self.max_val,x)
 
     def set_batch_count(self,count):
         self.batch_count = count 
-
-    def multiply_layer(self,x):
-        return x*0.4
     
     def build_encoder(self):
         encoder_inputs = keras.Input(shape=(64, 64, 32, 1))
@@ -101,13 +93,9 @@ class VAE(keras.Model):
         x = layers.Dense(self.decoder_dense_layers[2], activation=self.activation_function)(x)
         x = layers.Reshape((8, 8, 4, 16))(x)
         x = layers.UpSampling3D(size=(2,2,2))(x)
-        #for idx in range(len(self.decoder_conv_filters)):
         x = layers.Conv3DTranspose(self.decoder_conv_filters[0], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
-        #x = layers.UpSampling3D(size=(2,2,2))(x)
         x = layers.Conv3DTranspose(self.decoder_conv_filters[1], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
-        x = layers.Conv3DTranspose(1, self.kernel_size, activation=self.output_activation_function, padding=self.padding)(x) #Stride 1 for collapsing into correct dimensions
-        decoder_outputs = layers.Lambda(self.multiply_layer)(x) #Tanh function normalizes between -1 and 1. We want the output to be between -0.4 and 0.4, so we multiply after the tanh operation
-        #decoder_outputs = layers.Lambda(self.thresholding_layer)(x) #Thresholds all values over a certain value to ensure that the training focuses on the shapes of objects
+        decoder_outputs = layers.Conv3DTranspose(1, self.kernel_size, activation=self.output_activation_function, padding=self.padding)(x) #Stride 1 for collapsing into correct dimensions
         decoder = keras.Model(latent_inputs, decoder_outputs, name="decoder")
         decoder.summary()
         return decoder
@@ -121,18 +109,6 @@ class VAE(keras.Model):
         ]
 
     def train_step(self, data):
-        #print(type(data))
-        #box_filtered = tf.nn.conv3d(data,self.blurring_kernel,[1,1,1,1,1],padding='SAME')
-        #edge_detected = self.sobel_edge_3d(data)
-        #Inspect original image
-        # plt.imshow(data[0,:,:,8,0],cmap="gray")
-        # plt.show()
-
-        #Inspect edge detected image
-        # plt.imshow(edge_detected[0,:,:,8,0], cmap="gray") 
-        # plt.show()
-        #gaussian_filtered_data = signal.convolve(np.array(data),self.blurring_kernel,mode="same")
-        #edge_detection_data = ndimage.sobel(gaussian_filtered_data,mode="reflect")
         with tf.GradientTape() as tape:
             z_mean, z_log_var, z = self.encoder(data)
             reconstruction = self.decoder(z)
@@ -159,12 +135,6 @@ class VAE(keras.Model):
         return self.decoder(z_mean)
 
     def test_step(self,data):
-        #box_filtered = tf.nn.conv3d(data,self.blurring_kernel,[1,1,1,1,1],padding='SAME')
-        #edge_detected = self.sobel_edge_3d(data)
-
-
-        # gaussian_filtered_data = signal.convolve(np.array(data),self.blurring_kernel,mode="same")
-        # edge_detection_data = ndimage.sobel(gaussian_filtered_data,mode="reflect")
         z_mean, z_log_var, z = self.encoder(data)
         reconstruction = self.decoder(z)
         reconstruction_loss = tf.reduce_mean(
@@ -179,7 +149,7 @@ class VAE(keras.Model):
 
     def write_summary_to_file(self):
         file1 = open(self.base_path+"/network_and_training_summary.txt","w")
-        Data_to_save = f'Latent space dimension:{self.latent_dim}\nActivation function:'+self.activation_function+f'\nConvolution kernel size:{self.kernel_size}\nConvolution strides:{self.strides}\nPadding:{self.padding}\nBatch size:{self.batch_size}\nEpochs:{self.epochs}\nOptimizer:{type(self.optimizer)}\nLearning rate:{self.learning_rate}\nThreshold for output:{self.output_threshold}\nLoss function: {self.loss_function}\nDataset dir:{self.dataset_dir}\n\nAutoencoder network summary:\nEncoder convolutional filters:{self.encoder_conv_filters}\nEncoder dense layers:{self.encoder_dense_layers}\n\nDecoder Convolutional filters:{self.decoder_conv_filters}\nDecoder dense layers:{self.decoder_dense_layers}\n'
+        Data_to_save = f'Latent space dimension:{self.latent_dim}\nActivation function:'+self.activation_function+f'\nConvolution kernel size:{self.kernel_size}\nConvolution strides:{self.strides}\nPadding:{self.padding}\nBatch size:{self.batch_size}\nEpochs:{self.epochs}\nOptimizer:{type(self.optimizer)}\nLearning rate:{self.learning_rate}\nLoss function: {self.loss_function}\nDataset dir:{self.dataset_dir}\n\nAutoencoder network summary:\nEncoder convolutional filters:{self.encoder_conv_filters}\nEncoder dense layers:{self.encoder_dense_layers}\n\nDecoder Convolutional filters:{self.decoder_conv_filters}\nDecoder dense layers:{self.decoder_dense_layers}\n'
         stringlist = []
         self.encoder.summary(line_length=120,print_fn=lambda x: stringlist.append(x))
         self.decoder.summary(line_length=120,print_fn=lambda x: stringlist.append(x))
