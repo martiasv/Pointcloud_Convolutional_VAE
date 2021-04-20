@@ -63,17 +63,6 @@ class unordered_pointcloud_to_latent_space():
 
         self.bin_thresh = rospy.get_param("~binarization_threshold")
 
-        ##Load the Lookup tables (LUTs) for the conversion between TSDF and tensorflow tensor
-        with open('../pickelled/lut/x_lut.pickle', 'rb') as f:
-            self.x_lut = pickle.load(f)
-
-        with open('../pickelled/lut/y_lut.pickle', 'rb') as f:
-            self.y_lut = pickle.load(f)
-
-        with open('../pickelled/lut/z_lut.pickle', 'rb') as f:
-            self.z_lut = pickle.load(f)
-
-
 
     def point_cloud_encoder_callback(self,pc):
         #Initalize empty array for TSDF to fill
@@ -81,12 +70,21 @@ class unordered_pointcloud_to_latent_space():
 
         #Convert from pointcloud2 to numpy array
         arr = np.array(ros_np.point_cloud2.pointcloud2_to_array(pc).tolist())
-        print(arr[:500])
 
-        #Convert from decimal position values, to enumerated index values
+        # #Convert from decimal position values, to enumerated index values
         x_unique,x_enum = np.unique(arr[:,0],return_inverse= True)
-        _,y_enum = np.unique(arr[:,1],return_inverse= True)
-        _,z_enum = np.unique(arr[:,2],return_inverse= True)
+        y_unique,y_enum = np.unique(arr[:,1],return_inverse= True)
+        z_unique,z_enum = np.unique(arr[:,2],return_inverse= True)
+
+        #Count the number of occurences smaller than 0 to shift values for correct values when TSDF map is initialized
+        x_smaller = (x_unique<0).sum()
+        y_smaller = (y_unique<0).sum()
+        z_smaller = (z_unique<0).sum()
+
+        #Shift values based on number of occurences
+        x_enum = x_enum + (27-x_smaller)
+        y_enum = y_enum + (27-y_smaller)
+        z_enum = z_enum + (8-z_smaller)
 
         #Fill numpy array with the correct intensity value at each index
         xyzi[x_enum,y_enum,z_enum]= arr[:,3]
@@ -99,7 +97,6 @@ class unordered_pointcloud_to_latent_space():
 
         #Do inference
         input_pc = np.array([tf_input])
-        #latent_space = self.vae.encoder.predict(input_pc)[0].tolist()[0]
         latent_space = self.vae.encoder.predict(input_pc)
 
         #Publish the result
@@ -144,7 +141,7 @@ class unordered_pointcloud_to_latent_space():
 
             #Publish pointcloud
             self.pc_pub.publish(output_pc)
-            #rospy.loginfo("Published Encoded-Decoded pointcloud")
+            rospy.loginfo("Published Encoded-Decoded pointcloud")
 
             if self.pub_slice == True:
                 #Flip image to match flying direction
@@ -152,7 +149,7 @@ class unordered_pointcloud_to_latent_space():
                 image_temp  = CvBridge().cv2_to_imgmsg(flipped_output_image)
                 image_temp.header = header
                 self.slice_pub.publish(image_temp)
-                #rospy.loginfo("Published Encoded-Decoded image slice")
+                rospy.loginfo("Published Encoded-Decoded image slice")
 
 
 
