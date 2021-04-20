@@ -66,7 +66,7 @@ class unordered_pointcloud_to_latent_space():
 
     def point_cloud_encoder_callback(self,pc):
         #Initalize empty array for TSDF to fill
-        xyzi = np.zeros((65,65,32))
+        xyzi = np.zeros((65,65,16))
 
         #Convert from pointcloud2 to numpy array
         arr = np.array(ros_np.point_cloud2.pointcloud2_to_array(pc).tolist())
@@ -85,6 +85,7 @@ class unordered_pointcloud_to_latent_space():
         x_enum = x_enum + (27-x_smaller)
         y_enum = y_enum + (27-y_smaller)
         z_enum = z_enum + (8-z_smaller)
+        print(f'Number of z values: {len(z_unique)}')
 
         #Fill numpy array with the correct intensity value at each index
         xyzi[x_enum,y_enum,z_enum]= arr[:,3]
@@ -93,7 +94,7 @@ class unordered_pointcloud_to_latent_space():
         binarized = np.where(xyzi > self.bin_thresh, 1,0)
 
         #Format for TF
-        tf_input = np.reshape(binarized[:64,:64,:],(64,64,32,1))
+        tf_input = np.reshape(binarized[:64,:64,:],(64,64,16,1))
 
         #Do inference
         input_pc = np.array([tf_input])
@@ -112,7 +113,7 @@ class unordered_pointcloud_to_latent_space():
             scale_factor = np.abs(x_unique[0]-x_unique[1])
 
             #Convert output image to list of points
-            output_image = np.reshape(output_image,(64,64,32))
+            output_image = np.reshape(output_image,(64,64,16))
             cropped_output_image = output_image[:54,:54,:16]
             m,n,l = cropped_output_image.shape
             R,C,T = np.mgrid[:m,:n,:l]*scale_factor

@@ -24,12 +24,12 @@ for env in envs:
             print(f'Env {env} batch {i} shape: {array.shape}')
             pointcloud_list.append(array)
 
-pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches*len(envs),65,65,20,1))
+pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches*len(envs),65,65,16,1))
 
 
 #Need to reshape array for compatibility with triple conv encoder
-new_pc_array = np.zeros((1000*num_batches*len(envs),65,65,32,1))
-new_pc_array[:,:,:,:20,:] = pointcloud_array
+new_pc_array = np.zeros((1000*num_batches*len(envs),65,65,16,1))
+new_pc_array[:,:,:,:,:] = pointcloud_array
 pointcloud_array = new_pc_array
 
 #Clear from memory

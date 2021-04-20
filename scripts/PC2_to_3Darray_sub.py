@@ -23,7 +23,7 @@ class unordered_pointcloud_to_3Darray_dataset():
     def point_cloud_callback(self,pc):
         #Loop 1 is slow
         start_time_1 = time.monotonic()
-        xyzi = np.zeros((65,65,20))
+        xyzi = np.zeros((65,65,16))
         arr = np.array(ros_np.point_cloud2.pointcloud2_to_array(pc).tolist())
         end_time_1 = time.monotonic()
 

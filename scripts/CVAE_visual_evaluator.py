@@ -22,7 +22,7 @@ test_images_indices = [0,8,14,19]
 with open('../pickelled/test_set_4envs/test_set_4envs.pickle', 'rb') as f:
     pointcloud_list.append(np.array(pickle.load(f)))
 
-pointcloud_array = np.reshape(pointcloud_list,(20,65,65,20,1))
+pointcloud_array = np.reshape(pointcloud_list,(20,65,65,16,1))
 
 #Need to reshape array for compatibility with triple conv encoder
 new_pc_array = np.zeros((20,65,65,24,1))

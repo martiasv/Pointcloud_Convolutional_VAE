@@ -69,7 +69,7 @@ class VAE(keras.Model):
         self.batch_count = count 
     
     def build_encoder(self):
-        encoder_inputs = keras.Input(shape=(64, 64, 32, 1))
+        encoder_inputs = keras.Input(shape=(64, 64, 16, 1))
         x = encoder_inputs
         #for idx in range(len(self.encoder_conv_filters)):
         x = layers.Conv3D(self.encoder_conv_filters[0], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
