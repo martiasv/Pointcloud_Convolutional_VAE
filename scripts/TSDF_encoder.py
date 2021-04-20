@@ -63,6 +63,16 @@ class unordered_pointcloud_to_latent_space():
 
         self.bin_thresh = rospy.get_param("~binarization_threshold")
 
+        ##Load the Lookup tables (LUTs) for the conversion between TSDF and tensorflow tensor
+        with open('../pickelled/lut/x_lut.pickle', 'rb') as f:
+            self.x_lut = pickle.load(f)
+
+        with open('../pickelled/lut/y_lut.pickle', 'rb') as f:
+            self.y_lut = pickle.load(f)
+
+        with open('../pickelled/lut/z_lut.pickle', 'rb') as f:
+            self.z_lut = pickle.load(f)
+
 
 
     def point_cloud_encoder_callback(self,pc):
@@ -71,6 +81,7 @@ class unordered_pointcloud_to_latent_space():
 
         #Convert from pointcloud2 to numpy array
         arr = np.array(ros_np.point_cloud2.pointcloud2_to_array(pc).tolist())
+        print(arr[:500])
 
         #Convert from decimal position values, to enumerated index values
         x_unique,x_enum = np.unique(arr[:,0],return_inverse= True)
@@ -133,7 +144,7 @@ class unordered_pointcloud_to_latent_space():
 
             #Publish pointcloud
             self.pc_pub.publish(output_pc)
-            rospy.loginfo("Published Encoded-Decoded pointcloud")
+            #rospy.loginfo("Published Encoded-Decoded pointcloud")
 
             if self.pub_slice == True:
                 #Flip image to match flying direction
@@ -141,7 +152,7 @@ class unordered_pointcloud_to_latent_space():
                 image_temp  = CvBridge().cv2_to_imgmsg(flipped_output_image)
                 image_temp.header = header
                 self.slice_pub.publish(image_temp)
-                rospy.loginfo("Published Encoded-Decoded image slice")
+                #rospy.loginfo("Published Encoded-Decoded image slice")
 
 
 
