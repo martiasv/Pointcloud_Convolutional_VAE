@@ -85,7 +85,6 @@ class unordered_pointcloud_to_latent_space():
         x_enum = x_enum + (27-x_smaller)
         y_enum = y_enum + (27-y_smaller)
         z_enum = z_enum + (8-z_smaller)
-        print(f'Number of z values: {len(z_unique)}')
 
         #Fill numpy array with the correct intensity value at each index
         xyzi[x_enum,y_enum,z_enum]= arr[:,3]
