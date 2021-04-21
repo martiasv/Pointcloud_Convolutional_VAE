@@ -23,16 +23,26 @@ class unordered_pointcloud_to_3Darray_dataset():
     def point_cloud_callback(self,pc):
         #Loop 1 is slow
         start_time_1 = time.monotonic()
-        xyzi = np.zeros((65,65,20))
+        xyzi = np.zeros((65,65,16))
         arr = np.array(ros_np.point_cloud2.pointcloud2_to_array(pc).tolist())
         end_time_1 = time.monotonic()
 
         #Loop 2 is fast
         start_time_2 = time.monotonic()
-        _,x_enum = np.unique(arr[:,0],return_inverse= True)
-        _,y_enum = np.unique(arr[:,1],return_inverse= True)
-        _,z_enum = np.unique(arr[:,2],return_inverse= True)
+        x_unique,x_enum = np.unique(arr[:,0],return_inverse= True)
+        y_unique,y_enum = np.unique(arr[:,1],return_inverse= True)
+        z_unique,z_enum = np.unique(arr[:,2],return_inverse= True)
         end_time_2 = time.monotonic()
+
+        #Count the number of occurences smaller than 0 to shift values for correct values when TSDF map is initialized
+        x_smaller = (x_unique<0).sum()
+        y_smaller = (y_unique<0).sum()
+        z_smaller = (z_unique<0).sum()
+
+        #Shift values based on number of occurences
+        x_enum = x_enum + (27-x_smaller)
+        y_enum = y_enum + (27-y_smaller)
+        z_enum = z_enum + (8-z_smaller)
 
         #Loop 3 is superfast
         start_time_3 = time.monotonic()

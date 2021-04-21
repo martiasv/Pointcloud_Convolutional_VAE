@@ -27,7 +27,7 @@ for env in envs:
         print(f'Env {env} batch 1 shape: {array.shape}')
         pointcloud_list.append(array)
 
-pointcloud_array = np.reshape(pointcloud_list,(1000*len(envs),65,65,20,1))
+pointcloud_array = np.reshape(pointcloud_list,(1000*len(envs),65,65,16,1))
 
 
 #Need to reshape array for compatibility with triple conv encoder
@@ -79,7 +79,7 @@ for env in envs:
         print(f'Env {env} batch 2 shape: {array.shape}')
         pointcloud_list.append(array)
 
-pointcloud_array = np.reshape(pointcloud_list,(1000*len(envs),65,65,20,1))
+pointcloud_array = np.reshape(pointcloud_list,(1000*len(envs),65,65,16,1))
 
 
 #Need to reshape array for compatibility with triple conv encoder
@@ -117,7 +117,7 @@ for env in envs:
         print(f'Env {env} batch 3 shape: {array.shape}')
         pointcloud_list.append(array)
 
-pointcloud_array = np.reshape(pointcloud_list,(1000*len(envs),65,65,20,1))
+pointcloud_array = np.reshape(pointcloud_list,(1000*len(envs),65,65,16,1))
 
 
 #Need to reshape array for compatibility with triple conv encoder
@@ -155,7 +155,7 @@ for env in envs:
         print(f'Env {env} batch 4 shape: {array.shape}')
         pointcloud_list.append(array)
 
-pointcloud_array = np.reshape(pointcloud_list,(1000*len(envs),65,65,20,1))
+pointcloud_array = np.reshape(pointcloud_list,(1000*len(envs),65,65,16,1))
 
 
 #Need to reshape array for compatibility with triple conv encoder
