@@ -60,7 +60,7 @@ class unordered_pointcloud_to_3Darray_dataset():
         self.XYZI_pointclouds.append(xyzi)
         print(f'{self.count} pointclouds')
         if len(self.XYZI_pointclouds)%1000==0:
-            with open(f'src/pointcloud_utils/pickelled/test_corridor_yawless_spawn/raw/pointclouds_batch{self.count//1000}.pickle', 'wb') as f:
+            with open(f'src/pointcloud_utils/pickelled/test_corridor_yawless_spawn/raw/pointclouds_batch{self.count//1000+9}.pickle', 'wb') as f:
                 pickle.dump(self.XYZI_pointclouds, f, pickle.HIGHEST_PROTOCOL)
             print(f'Batch {self.count//1000}: Pickling complete')
             self.XYZI_pointclouds = []

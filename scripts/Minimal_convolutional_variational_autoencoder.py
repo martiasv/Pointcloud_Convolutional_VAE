@@ -36,9 +36,9 @@ class VAE(keras.Model):
         self.strides = 2
         self.padding = "same"
         self.encoder_conv_filters = [8,16]
-        self.encoder_dense_layers = [128,64]
+        self.encoder_dense_layers = [128,128]
         self.decoder_conv_filters = [16,8]
-        self.decoder_dense_layers = [64,128,8*8*4*16]
+        self.decoder_dense_layers = [128,128,8*8*2*16]
         self.save_freq = 8 #Save after this many epochs
         self.dataset_size = dataset_size
         self.validation_split = 0.2
@@ -91,7 +91,7 @@ class VAE(keras.Model):
         x = layers.Dense(self.decoder_dense_layers[0], activation=self.activation_function)(latent_inputs)
         x = layers.Dense(self.decoder_dense_layers[1], activation=self.activation_function)(x)
         x = layers.Dense(self.decoder_dense_layers[2], activation=self.activation_function)(x)
-        x = layers.Reshape((8, 8, 4, 16))(x)
+        x = layers.Reshape((8, 8, 2, 16))(x)
         x = layers.UpSampling3D(size=(2,2,2))(x)
         x = layers.Conv3DTranspose(self.decoder_conv_filters[0], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
         x = layers.Conv3DTranspose(self.decoder_conv_filters[1], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
