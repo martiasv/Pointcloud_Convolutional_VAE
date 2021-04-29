@@ -1,6 +1,6 @@
 <model name='large_box_0'>
 	<static>1</static>
-	<pose frame=''>17.19132675320803 1.0994187676902563 0.29101848857710966 0 -0 5.064456822253796</pose>
+	<pose frame=''>32.17435597121026 -3.557737466605543 0 0 -0 3.691924820314133</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -17,7 +17,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 2 2 0.5820369771542193 </size>
+					<size> 2 2 7.593778229513632 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -37,7 +37,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 2 2 0.5820369771542193 </size>
+				<size> 2 2 7.593778229513632 </size>
 			</box>
 		</geometry>
 		<material>
@@ -53,7 +53,7 @@
 </link>
 </model><model name='large_box_1'>
 	<static>1</static>
-	<pose frame=''>9.955659378058442 0.2804222096131328 0.44810388182849437 0 -0 0.5135680243131882</pose>
+	<pose frame=''>-42.48912059427893 3.5659388070153737 0 0 -0 0.9737297801409254</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -70,7 +70,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 2 2 0.8962077636569887 </size>
+					<size> 2 2 6.71880683445423 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -90,7 +90,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 2 2 0.8962077636569887 </size>
+				<size> 2 2 6.71880683445423 </size>
 			</box>
 		</geometry>
 		<material>
@@ -106,7 +106,7 @@
 </link>
 </model><model name='large_box_2'>
 	<static>1</static>
-	<pose frame=''>-29.740817443682865 1.0039282449734364 1.3937295297850658 0 -0 4.28314366434271</pose>
+	<pose frame=''>-13.01944412521511 -1.110495902068842 0 0 -0 6.168273108836437</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -123,7 +123,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 2 2 2.7874590595701316 </size>
+					<size> 2 2 6.961490497161987 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -143,7 +143,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 2 2 2.7874590595701316 </size>
+				<size> 2 2 6.961490497161987 </size>
 			</box>
 		</geometry>
 		<material>
@@ -159,7 +159,7 @@
 </link>
 </model><model name='large_box_3'>
 	<static>1</static>
-	<pose frame=''>29.08966999564643 3.9399584001346684 0.08076415806741499 0 -0 3.3084986680925668</pose>
+	<pose frame=''>29.36420977655642 -2.666481407591867 0 0 -0 0.49820951172487093</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -176,7 +176,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 2 2 0.16152831613482999 </size>
+					<size> 2 2 0.21425760080132417 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -196,7 +196,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 2 2 0.16152831613482999 </size>
+				<size> 2 2 0.21425760080132417 </size>
 			</box>
 		</geometry>
 		<material>
@@ -212,7 +212,7 @@
 </link>
 </model><model name='large_box_4'>
 	<static>1</static>
-	<pose frame=''>29.131083074183707 -0.1449111548903499 1.4581652222740829 0 -0 4.690224078726423</pose>
+	<pose frame=''>-49.69364766389236 0.3254638092771778 0 0 -0 4.136685360800977</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -229,7 +229,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 2 2 2.9163304445481657 </size>
+					<size> 2 2 1.2311654168233854 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -249,7 +249,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 2 2 2.9163304445481657 </size>
+				<size> 2 2 1.2311654168233854 </size>
 			</box>
 		</geometry>
 		<material>
@@ -265,7 +265,7 @@
 </link>
 </model><model name='medium_box_0'>
 	<static>1</static>
-	<pose frame=''>39.508180553043076 1.3245715090821184 0.2736344113593985 0 -0 3.3321102763870907</pose>
+	<pose frame=''>-20.782703040551233 0.46170815098987017 0 0 -0 5.403689618186876</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -282,7 +282,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 1.5 1.5 0.547268822718797 </size>
+					<size> 1.5 1.5 0.17924109490831874 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -302,7 +302,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 1.5 1.5 0.547268822718797 </size>
+				<size> 1.5 1.5 0.17924109490831874 </size>
 			</box>
 		</geometry>
 		<material>
@@ -318,7 +318,7 @@
 </link>
 </model><model name='medium_box_1'>
 	<static>1</static>
-	<pose frame=''>40.6003304842327 2.3512922114844343 1.0060296398887005 0 -0 5.4664338786408955</pose>
+	<pose frame=''>28.080300052431966 1.3872722775879343 0 0 -0 0.4098113003360216</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -335,7 +335,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 1.5 1.5 2.012059279777401 </size>
+					<size> 1.5 1.5 1.376853672088389 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -355,7 +355,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 1.5 1.5 2.012059279777401 </size>
+				<size> 1.5 1.5 1.376853672088389 </size>
 			</box>
 		</geometry>
 		<material>
@@ -371,7 +371,7 @@
 </link>
 </model><model name='medium_box_2'>
 	<static>1</static>
-	<pose frame=''>-37.86444364654583 3.9683972762164244 0.5640729657052985 0 -0 4.450454688588171</pose>
+	<pose frame=''>42.88502899970247 -1.87160714658049 0 0 -0 2.30592073728363</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -388,7 +388,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 1.5 1.5 1.128145931410597 </size>
+					<size> 1.5 1.5 4.933737351890664 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -408,7 +408,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 1.5 1.5 1.128145931410597 </size>
+				<size> 1.5 1.5 4.933737351890664 </size>
 			</box>
 		</geometry>
 		<material>
@@ -424,7 +424,7 @@
 </link>
 </model><model name='medium_box_3'>
 	<static>1</static>
-	<pose frame=''>-23.773011300579427 0.3943738837061854 1.6888111332162685 0 -0 5.318242452966107</pose>
+	<pose frame=''>41.40458145334715 -2.375825730253494 0 0 -0 3.1870616118674526</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -441,7 +441,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 1.5 1.5 3.377622266432537 </size>
+					<size> 1.5 1.5 5.853620778848329 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -461,7 +461,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 1.5 1.5 3.377622266432537 </size>
+				<size> 1.5 1.5 5.853620778848329 </size>
 			</box>
 		</geometry>
 		<material>
@@ -477,7 +477,7 @@
 </link>
 </model><model name='medium_box_4'>
 	<static>1</static>
-	<pose frame=''>12.549981326222479 -1.6693921526617164 0.5342835000413757 0 -0 5.251115819318856</pose>
+	<pose frame=''>14.62254249442799 -1.175886384074178 0 0 -0 0.793849142406307</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -494,7 +494,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 1.5 1.5 1.0685670000827514 </size>
+					<size> 1.5 1.5 5.173459468544656 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -514,7 +514,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 1.5 1.5 1.0685670000827514 </size>
+				<size> 1.5 1.5 5.173459468544656 </size>
 			</box>
 		</geometry>
 		<material>
@@ -530,7 +530,7 @@
 </link>
 </model><model name='small_box_0'>
 	<static>1</static>
-	<pose frame=''>5.777767444561 2.988826904678179 1.610472812252434 0 -0 4.715297950070794</pose>
+	<pose frame=''>41.00091690137886 -1.83543718980836 0 0 -0 1.2586247394415748</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -547,7 +547,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 1 1 3.220945624504868 </size>
+					<size> 1 1 4.9899803500856015 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -567,7 +567,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 1 1 3.220945624504868 </size>
+				<size> 1 1 4.9899803500856015 </size>
 			</box>
 		</geometry>
 		<material>
@@ -583,7 +583,7 @@
 </link>
 </model><model name='small_box_1'>
 	<static>1</static>
-	<pose frame=''>-6.373771137884631 -3.958397677490618 0.5571125179459611 0 -0 4.785604424962455</pose>
+	<pose frame=''>-47.60641342273361 -1.2774118509870966 0 0 -0 0.8633244958221935</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -600,7 +600,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 1 1 1.1142250358919221 </size>
+					<size> 1 1 1.0479185024592343 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -620,7 +620,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 1 1 1.1142250358919221 </size>
+				<size> 1 1 1.0479185024592343 </size>
 			</box>
 		</geometry>
 		<material>
@@ -636,7 +636,7 @@
 </link>
 </model><model name='small_box_2'>
 	<static>1</static>
-	<pose frame=''>35.98926944862011 1.1337720329159948 0.44010490480362496 0 -0 4.164149768693731</pose>
+	<pose frame=''>18.68614555212298 -2.084281735511671 0 0 -0 5.553791266161545</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -653,7 +653,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 1 1 0.8802098096072499 </size>
+					<size> 1 1 1.6368336689678848 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -673,7 +673,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 1 1 0.8802098096072499 </size>
+				<size> 1 1 1.6368336689678848 </size>
 			</box>
 		</geometry>
 		<material>
@@ -689,7 +689,7 @@
 </link>
 </model><model name='small_box_3'>
 	<static>1</static>
-	<pose frame=''>25.215163360613033 -2.411579014466053 0.2681976832867863 0 -0 3.076611891333769</pose>
+	<pose frame=''>29.372710968965734 -1.5240144831673952 0 0 -0 3.281459230555775</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -706,7 +706,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 1 1 0.5363953665735726 </size>
+					<size> 1 1 1.748782886718966 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -726,7 +726,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 1 1 0.5363953665735726 </size>
+				<size> 1 1 1.748782886718966 </size>
 			</box>
 		</geometry>
 		<material>
@@ -742,7 +742,7 @@
 </link>
 </model><model name='small_box_4'>
 	<static>1</static>
-	<pose frame=''>-27.64807882539855 1.1592541705111579 0.6945138806303399 0 -0 5.90352781859749</pose>
+	<pose frame=''>-28.03717044312959 -2.1980021272633747 0 0 -0 2.864820419884264</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -759,7 +759,7 @@
 		<collision name='collision'>
 			<geometry>
 				<box>
-					<size> 1 1 1.3890277612606798 </size>
+					<size> 1 1 5.464525609698614 </size>
 				</box>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -779,7 +779,7 @@
 <visual name='visual'>
 		<geometry>
 			<box>
-				<size> 1 1 1.3890277612606798 </size>
+				<size> 1 1 5.464525609698614 </size>
 			</box>
 		</geometry>
 		<material>
@@ -795,7 +795,7 @@
 </link>
 </model><model name='large_sphere_0'>
 	<static>1</static>
-	<pose frame=''>-17.574280797826567 2.423832170122461 1.5 0 -0 0.85352005873583</pose>
+	<pose frame=''>-20.60356003044901 3.6258969336021174 1.5 0 -0 4.300240458436616</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -848,7 +848,7 @@
 </link>
 </model><model name='large_sphere_1'>
 	<static>1</static>
-	<pose frame=''>13.343489197402583 1.5832838361049406 1.5 0 -0 3.0039026770930852</pose>
+	<pose frame=''>41.132335340218546 2.9114039457469048 1.5 0 -0 2.213090437890468</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -901,7 +901,7 @@
 </link>
 </model><model name='large_sphere_2'>
 	<static>1</static>
-	<pose frame=''>-4.7280338805755875 0.1680060298999102 1.5 0 -0 5.5702493061244</pose>
+	<pose frame=''>-39.54238151366562 2.62250765762358 1.5 0 -0 2.5706933148830786</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -954,7 +954,7 @@
 </link>
 </model><model name='large_sphere_3'>
 	<static>1</static>
-	<pose frame=''>-14.363598776973177 -2.395434178890098 1.5 0 -0 1.9320987154422402</pose>
+	<pose frame=''>-40.8825620154594 -1.2773216883822034 1.5 0 -0 5.586844586171651</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1007,7 +1007,7 @@
 </link>
 </model><model name='large_sphere_4'>
 	<static>1</static>
-	<pose frame=''>-1.0084869850765585 2.271106678775957 1.5 0 -0 4.696691657207284</pose>
+	<pose frame=''>-39.913918695626705 1.1168912827791955 1.5 0 -0 2.8550895264514122</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1060,7 +1060,7 @@
 </link>
 </model><model name='medium_sphere_0'>
 	<static>1</static>
-	<pose frame=''>-37.86274450837036 -2.8318072012545326 1 0 -0 1.3138779021895335</pose>
+	<pose frame=''>1.9215005125114075 -0.6408985456512735 1 0 -0 5.378131564031651</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1113,7 +1113,7 @@
 </link>
 </model><model name='medium_sphere_1'>
 	<static>1</static>
-	<pose frame=''>2.9283832623193646 -0.6318704060138716 1 0 -0 1.3527330011828074</pose>
+	<pose frame=''>-16.952640259954578 -3.8722912600626476 1 0 -0 4.198937903769371</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1166,7 +1166,7 @@
 </link>
 </model><model name='medium_sphere_2'>
 	<static>1</static>
-	<pose frame=''>18.766765300545003 2.3047312586841358 1 0 -0 2.6589238024494803</pose>
+	<pose frame=''>-7.101246409723615 0.5359230483927169 1 0 -0 4.876857622198666</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1219,7 +1219,7 @@
 </link>
 </model><model name='medium_sphere_3'>
 	<static>1</static>
-	<pose frame=''>-2.0500675920801754 2.6153020449649667 1 0 -0 1.519522599244969</pose>
+	<pose frame=''>-27.78917023100681 0.22156701731108264 1 0 -0 4.597829233989779</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1272,7 +1272,7 @@
 </link>
 </model><model name='medium_sphere_4'>
 	<static>1</static>
-	<pose frame=''>-14.416021947315514 -0.007820542931797014 1 0 -0 1.1446065346202603</pose>
+	<pose frame=''>30.959797839427992 -3.8492475128279535 1 0 -0 4.8792797200426685</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1325,7 +1325,7 @@
 </link>
 </model><model name='small_sphere_0'>
 	<static>1</static>
-	<pose frame=''>24.954764134099506 -2.8741903083329685 0.5 0 -0 6.174902797131602</pose>
+	<pose frame=''>30.507230505209264 2.595767401486051 0.5 0 -0 5.739761700194716</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1378,7 +1378,7 @@
 </link>
 </model><model name='small_sphere_1'>
 	<static>1</static>
-	<pose frame=''>2.5182444224201888 2.734813307211109 0.5 0 -0 0.6209894178409612</pose>
+	<pose frame=''>-43.14743979308612 0.9322106419569112 0.5 0 -0 2.331531266237528</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1431,7 +1431,7 @@
 </link>
 </model><model name='small_sphere_2'>
 	<static>1</static>
-	<pose frame=''>11.754238665160976 2.3327541277454626 0.5 0 -0 6.234836470721016</pose>
+	<pose frame=''>38.843261815681416 -0.3080680191956384 0.5 0 -0 1.2383637950372461</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1484,7 +1484,7 @@
 </link>
 </model><model name='small_sphere_3'>
 	<static>1</static>
-	<pose frame=''>23.99612233031411 -2.5076173854375234 0.5 0 -0 1.0035691906372177</pose>
+	<pose frame=''>23.66708825297843 0.38458802851914076 0.5 0 -0 1.1453287950494897</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1537,7 +1537,7 @@
 </link>
 </model><model name='small_sphere_4'>
 	<static>1</static>
-	<pose frame=''>11.043236672559274 -3.4226367364858232 0.5 0 -0 3.1053936550738777</pose>
+	<pose frame=''>-38.231067817734186 3.3137634869859625 0.5 0 -0 4.159015239009353</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1590,7 +1590,7 @@
 </link>
 </model><model name='large_cylinder_0'>
 	<static>1</static>
-	<pose frame=''>-42.77554207761952 0.33863765024467707 0.9960101361788831 0 -0 0.8425116677663554</pose>
+	<pose frame=''>-20.656152977621524 2.774102725665392 0 0 -0 3.1664840842828017</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1608,7 +1608,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 1.5 </radius>
-				<length> 1.9920202723577662 </length>
+				<length> 2.5667337177463843 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -1629,7 +1629,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 1.5 </radius>
-			<length> 1.9920202723577662 </length> 
+			<length> 2.5667337177463843 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -1645,7 +1645,7 @@
 </link>
 </model><model name='large_cylinder_1'>
 	<static>1</static>
-	<pose frame=''>-49.869642920986124 -0.9372026941414955 0.34740361136986997 0 -0 1.062984824342085</pose>
+	<pose frame=''>-47.10496589852531 1.4099979213386442 0 0 -0 4.724671580062465</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1663,7 +1663,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 1.5 </radius>
-				<length> 0.6948072227397399 </length>
+				<length> 0.7324768814299434 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -1684,7 +1684,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 1.5 </radius>
-			<length> 0.6948072227397399 </length> 
+			<length> 0.7324768814299434 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -1700,7 +1700,7 @@
 </link>
 </model><model name='large_cylinder_2'>
 	<static>1</static>
-	<pose frame=''>7.5056352885756965 -2.481515064804478 0.8088950503955448 0 -0 3.4707227512989975</pose>
+	<pose frame=''>18.908721679098917 2.602833175931818 0 0 -0 2.3771669514250204</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1718,7 +1718,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 1.5 </radius>
-				<length> 1.6177901007910895 </length>
+				<length> 7.744484665439633 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -1739,7 +1739,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 1.5 </radius>
-			<length> 1.6177901007910895 </length> 
+			<length> 7.744484665439633 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -1755,7 +1755,7 @@
 </link>
 </model><model name='large_cylinder_3'>
 	<static>1</static>
-	<pose frame=''>-45.18968191654368 1.9833474186385587 0.775684295483323 0 -0 2.673144190500226</pose>
+	<pose frame=''>-9.65226410505651 1.0784628421009268 0 0 -0 0.9756973980914934</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1773,7 +1773,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 1.5 </radius>
-				<length> 1.551368590966646 </length>
+				<length> 7.4644149720695445 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -1794,7 +1794,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 1.5 </radius>
-			<length> 1.551368590966646 </length> 
+			<length> 7.4644149720695445 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -1810,7 +1810,7 @@
 </link>
 </model><model name='large_cylinder_4'>
 	<static>1</static>
-	<pose frame=''>43.64980020192384 1.4376443367871001 0.38005837257545827 0 -0 3.905151173301322</pose>
+	<pose frame=''>-20.62494740440126 1.3802263095048897 0 0 -0 0.8684176690441536</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1828,7 +1828,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 1.5 </radius>
-				<length> 0.7601167451509165 </length>
+				<length> 0.8819466137154821 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -1849,7 +1849,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 1.5 </radius>
-			<length> 0.7601167451509165 </length> 
+			<length> 0.8819466137154821 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -1865,7 +1865,7 @@
 </link>
 </model><model name='medium_cylinder_0'>
 	<static>1</static>
-	<pose frame=''>-17.55121581333453 0.9007255181178468 0.42075894418662685 0 -0 4.177521446133403</pose>
+	<pose frame=''>12.614976544356239 2.885271286774624 0 0 -0 5.071527770535708</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1883,7 +1883,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 1 </radius>
-				<length> 0.8415178883732537 </length>
+				<length> 0.3900400415901428 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -1904,7 +1904,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 1 </radius>
-			<length> 0.8415178883732537 </length> 
+			<length> 0.3900400415901428 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -1920,7 +1920,7 @@
 </link>
 </model><model name='medium_cylinder_1'>
 	<static>1</static>
-	<pose frame=''>-25.278625138269906 -0.7550544276350744 0.5009419092545682 0 -0 5.529544384663924</pose>
+	<pose frame=''>43.417921601241346 -3.2957181855426656 0 0 -0 0.7078269547746949</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1938,7 +1938,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 1 </radius>
-				<length> 1.0018838185091363 </length>
+				<length> 6.383134864952567 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -1959,7 +1959,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 1 </radius>
-			<length> 1.0018838185091363 </length> 
+			<length> 6.383134864952567 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -1975,7 +1975,7 @@
 </link>
 </model><model name='medium_cylinder_2'>
 	<static>1</static>
-	<pose frame=''>-3.6464641352721685 3.8710078293292183 1.6257140910988461 0 -0 4.189111509977446</pose>
+	<pose frame=''>-39.55685212911207 -1.6933703769870307 0 0 -0 4.664653297675275</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -1993,7 +1993,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 1 </radius>
-				<length> 3.2514281821976923 </length>
+				<length> 5.939683810144603 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -2014,7 +2014,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 1 </radius>
-			<length> 3.2514281821976923 </length> 
+			<length> 5.939683810144603 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -2030,7 +2030,7 @@
 </link>
 </model><model name='medium_cylinder_3'>
 	<static>1</static>
-	<pose frame=''>48.08030939054228 -1.2136352378889423 1.5586602241641971 0 -0 1.7421497328521407</pose>
+	<pose frame=''>14.525928599638902 -2.1513184483549948 0 0 -0 5.846039115382745</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -2048,7 +2048,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 1 </radius>
-				<length> 3.1173204483283943 </length>
+				<length> 5.467273300850196 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -2069,7 +2069,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 1 </radius>
-			<length> 3.1173204483283943 </length> 
+			<length> 5.467273300850196 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -2085,7 +2085,7 @@
 </link>
 </model><model name='medium_cylinder_4'>
 	<static>1</static>
-	<pose frame=''>15.315987349421022 -1.5558420560311266 1.520266032224395 0 -0 5.954414997430281</pose>
+	<pose frame=''>-8.867006290253187 2.645172919253315 0 0 -0 6.080032938340819</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -2103,7 +2103,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 1 </radius>
-				<length> 3.04053206444879 </length>
+				<length> 0.12730315414528715 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -2124,7 +2124,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 1 </radius>
-			<length> 3.04053206444879 </length> 
+			<length> 0.12730315414528715 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -2140,7 +2140,7 @@
 </link>
 </model><model name='small_cylinder_0'>
 	<static>1</static>
-	<pose frame=''>34.221996897900965 3.7802578950074537 1.974025046740185 0 -0 6.219435452300958</pose>
+	<pose frame=''>42.12542435206635 -3.5524447392492204 0 0 -0 0.418007097705363</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -2158,7 +2158,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 0.5 </radius>
-				<length> 3.94805009348037 </length>
+				<length> 0.06134163242250246 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -2179,7 +2179,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 0.5 </radius>
-			<length> 3.94805009348037 </length> 
+			<length> 0.06134163242250246 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -2195,7 +2195,7 @@
 </link>
 </model><model name='small_cylinder_1'>
 	<static>1</static>
-	<pose frame=''>6.223491765431355 1.2510066040802004 0.6212076649816745 0 -0 2.526254431977105</pose>
+	<pose frame=''>-17.130954045247414 2.3948757427990106 0 0 -0 3.5474650939466414</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -2213,7 +2213,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 0.5 </radius>
-				<length> 1.242415329963349 </length>
+				<length> 5.298357455307256 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -2234,7 +2234,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 0.5 </radius>
-			<length> 1.242415329963349 </length> 
+			<length> 5.298357455307256 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -2250,7 +2250,7 @@
 </link>
 </model><model name='small_cylinder_2'>
 	<static>1</static>
-	<pose frame=''>22.271952590975403 -0.20070027605517549 0.06266896001411348 0 -0 3.010165501232965</pose>
+	<pose frame=''>17.412315194900202 2.0551649622318013 0 0 -0 1.9177750618594271</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -2268,7 +2268,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 0.5 </radius>
-				<length> 0.12533792002822697 </length>
+				<length> 2.6711459200370964 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -2289,7 +2289,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 0.5 </radius>
-			<length> 0.12533792002822697 </length> 
+			<length> 2.6711459200370964 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -2305,7 +2305,7 @@
 </link>
 </model><model name='small_cylinder_3'>
 	<static>1</static>
-	<pose frame=''>-47.00536625540731 3.327102195813522 1.0514141254401872 0 -0 1.7841294053969128</pose>
+	<pose frame=''>-31.430949822197384 0.7939496488238316 0 0 -0 5.462889182887538</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -2323,7 +2323,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 0.5 </radius>
-				<length> 2.1028282508803744 </length>
+				<length> 5.954245485369993 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -2344,7 +2344,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 0.5 </radius>
-			<length> 2.1028282508803744 </length> 
+			<length> 5.954245485369993 </length> 
 				</cylinder>
 		</geometry>
 		<material>
@@ -2360,7 +2360,7 @@
 </link>
 </model><model name='small_cylinder_4'>
 	<static>1</static>
-	<pose frame=''>36.28895987366275 -3.275292868811328 1.175403338789692 0 -0 0.33765129335114014</pose>
+	<pose frame=''>3.5799427174462934 3.447959396217418 0 0 -0 1.8035675280834669</pose>
 		<link name='link'>
 			<inertial>
 				<mass>1</mass>
@@ -2378,7 +2378,7 @@
 			<geometry>
 				<cylinder>
 					<radius> 0.5 </radius>
-				<length> 2.350806677579384 </length>
+				<length> 4.885724227384313 </length>
 				</cylinder>
 			</geometry>
 		<max_contacts>10</max_contacts>
@@ -2399,7 +2399,7 @@
 		<geometry>
 			<cylinder>
 				<radius> 0.5 </radius>
-			<length> 2.350806677579384 </length> 
+			<length> 4.885724227384313 </length> 
 				</cylinder>
 		</geometry>
 		<material>

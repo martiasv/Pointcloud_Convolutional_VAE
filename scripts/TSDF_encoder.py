@@ -12,6 +12,7 @@ import ros_numpy as ros_np
 from sensor_msgs.msg import PointCloud2
 from sensor_msgs.msg import PointField
 from sensor_msgs.msg import Image
+from visualization_msgs.msg import MarkerArray, Marker
 import rospy
 import numpy as np
 import time
@@ -22,6 +23,7 @@ import Convolutional_variational_autoencoder as CVAE
 import Minimal_convolutional_variational_autoencoder as MCVAE
 from std_msgs.msg import Float32MultiArray
 from std_msgs.msg import Header
+from geometry_msgs.msg import Quaternion
 import argparse
 import tensorflow as tf
 from tensorflow import keras
@@ -32,7 +34,7 @@ import cv2
 from cv_bridge import CvBridge
 
 class unordered_pointcloud_to_latent_space():
-    def __init__(self,pc_topic="/gagarin/tsdf_server/tsdf_pointcloud",lat_topic="/gagarin/pc_latent_space",recon_topic="/gagarin/reconstructed_pc",slice_pub="/gagarin/pc_slice"):
+    def __init__(self,pc_topic="/gagarin/tsdf_server/tsdf_pointcloud",lat_topic="/gagarin/pc_latent_space",recon_topic="/gagarin/reconstructed_pc",slice_pub="/gagarin/pc_slice",voxel_pub="/gagarin/voxel_pub"):
 
         #Import model weight path
         self.arg_filepath = rospy.get_param("~model_weight_path")
@@ -60,6 +62,12 @@ class unordered_pointcloud_to_latent_space():
             self.slice_pub = rospy.Publisher(slice_pub,Image,queue_size=1)
         else:
             self.pub_slice = False
+
+        if rospy.get_param("~publish_voxels"):
+            self.pub_voxels = True
+            self.voxel_pub = rospy.Publisher(voxel_pub, MarkerArray,queue_size=1)
+        else:
+            self.pub_voxels = False
 
         self.bin_thresh = rospy.get_param("~binarization_threshold")
 
@@ -143,15 +151,42 @@ class unordered_pointcloud_to_latent_space():
             self.pc_pub.publish(output_pc)
             rospy.loginfo("Published Encoded-Decoded pointcloud")
 
+            #Flip image to match flying direction
+            flipped_output_image = np.flip(np.flip(cropped_output_image,axis=1),axis=0)
             if self.pub_slice == True:
-                #Flip image to match flying direction
-                flipped_output_image = np.flip(np.flip(cropped_output_image[:,:,8],axis=1),axis=0)
-                image_temp  = CvBridge().cv2_to_imgmsg(flipped_output_image)
+                image_temp  = CvBridge().cv2_to_imgmsg(flipped_output_image[:,:,8])
                 image_temp.header = header
                 self.slice_pub.publish(image_temp)
                 rospy.loginfo("Published Encoded-Decoded image slice")
 
-
+            if self.pub_voxels == True:
+                markerarray = MarkerArray()
+                filtered_points = points[points[:,3]<0.3]
+                marker_ctr = 0
+                for markers in filtered_points:
+                    marker = Marker()
+                    marker.header = header
+                    marker.type = marker.CUBE
+                    marker.action = marker.ADD
+                    marker.scale.x = 0.14
+                    marker.scale.y = 0.14
+                    marker.scale.z = 0.14
+                    marker.color.a = 1-markers[3]
+                    marker.color.r = 255
+                    marker.color.g = 0
+                    marker.color.b = 0
+                    marker.id = marker_ctr
+                    marker_ctr +=1
+                    marker.pose.position.x = markers[0]
+                    marker.pose.position.y = markers[1]
+                    marker.pose.position.z = markers[2]
+                    marker.pose.orientation.x = 1
+                    marker.pose.orientation.y = 0
+                    marker.pose.orientation.z = 0
+                    marker.pose.orientation.w = 0
+                    markerarray.markers.append(marker)
+                self.voxel_pub.publish(markerarray)
+                rospy.loginfo("Published Encoded-Decoded voxels")
 
 
 
