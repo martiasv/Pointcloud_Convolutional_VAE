@@ -9,7 +9,7 @@ from gazebo_msgs.msg import ContactsState, ModelState
 x_range = [-50,50]
 y_range = [-4,4]
 z_rot_range = [0,6.28]
-num_obstacles = 5
+num_obstacles = 8
 num_type_obstacles = 9
 base_names = ['small_spheres_','medium_spheres_','large_spheres_','small_boxes_','medium_boxes_','large_boxes_','small_cylinders_','medium_cylinders_','large_cylinders_']
 

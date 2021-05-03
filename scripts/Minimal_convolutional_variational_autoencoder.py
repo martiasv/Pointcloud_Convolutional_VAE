@@ -47,7 +47,7 @@ class VAE(keras.Model):
         self.decoder = self.build_decoder()
 
         #Define training loss functions
-        self.loss_function = keras.losses.BinaryCrossentropy
+        self.loss_function = keras.losses.binary_crossentropy
         self.total_loss_tracker = keras.metrics.Mean(name="total_loss")
         self.reconstruction_loss_tracker = keras.metrics.Mean(name="reconstruction_loss")
         self.kl_loss_tracker = keras.metrics.Mean(name="kl_loss")
