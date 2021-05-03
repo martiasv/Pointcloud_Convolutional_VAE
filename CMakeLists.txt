@@ -40,7 +40,9 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-
+catkin_install_python(PROGRAMS scripts/gazebo_env_scrambler.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 
 

@@ -16,7 +16,7 @@ for name in names_envs:
     with open('../pickelled/' +name + '/shuffled/pointclouds_batch1.pickle', 'rb') as f:
         pointcloud_list.append(np.array(pickle.load(f)))
 
-pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches,65,65,20,1))
+pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches,65,65,16,1))
 
 print(pointcloud_array.shape)
 

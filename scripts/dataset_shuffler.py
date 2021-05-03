@@ -7,13 +7,13 @@ import numpy as np
 
 
 pointcloud_list = []
-num_batches = 4
+num_batches = 1
 #names_envs = ['cave','test_tunnel']
 #names_envs = ['small_obstacles','large_obstacles','cave','tunnel']
 
 ##Load dataset
 for i in range(num_batches):
-    with open('../pickelled/test_corridor_yawless/raw/pointclouds_batch'+str(i+1)+'.pickle', 'rb') as f:
+    with open('../pickelled/test_corridor_yawless_spawn/raw/pointclouds_batch'+str(i+1)+'.pickle', 'rb') as f:
         pointcloud_list.append(np.array(pickle.load(f)))
 
 pointcloud_array = np.reshape(pointcloud_list,(1000*num_batches,65,65,16,1))
@@ -25,6 +25,6 @@ np.random.shuffle(pointcloud_array)
 
 print(f'Pickling shuffled pointclouds')
 for i in range(num_batches):
-    with open(f'../pickelled/test_corridor_yawless/shuffled/pointclouds_batch{i+1}.pickle', 'wb') as f:
+    with open(f'../pickelled/test_corridor_yawless_spawn/shuffled/pointclouds_batch{i+1}.pickle', 'wb') as f:
         pickle.dump(pointcloud_array[i*1000:(i+1)*1000,:,:,:], f, pickle.HIGHEST_PROTOCOL)
     print(f'Batch {i+1}: Pickling complete')
