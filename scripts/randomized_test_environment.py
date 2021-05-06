@@ -3,7 +3,7 @@ import random
 
 x_range = [-50,50]
 y_range = [-4,4]
-z_range = [0,8] #randomize height of objects. Objects will be half this size, as center is placed at z = 0
+z_range = [0,10] #randomize height of objects. Objects will be half this size, as center is placed at z = 0
 z_rot_range = [0,6.28]
 num_obstacles = 8
 

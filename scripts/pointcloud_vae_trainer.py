@@ -49,10 +49,15 @@ np.random.shuffle(pointcloud_array)
 random_index = [np.random.uniform(low=0,high=1000*num_batches) for x in range(15)]
 
 #Inspection of input data
-for i in range(len(random_index)):
-    plt.imshow(pointcloud_array[i,:64,:64,8,0], cmap="gray") 
-    plt.show()
+# for i in range(len(random_index)):
+#     plt.imshow(pointcloud_array[i,:64,:64,8,0], cmap="gray") 
+#     plt.show()
 
+#Double checking UAV position
+double_check_image = pointcloud_array[0,:,:,8,0]
+double_check_image[26,26] = 2
+plt.imshow(double_check_image, cmap="gray") 
+plt.show()
 
 #Train
 vae.save_weights(vae.checkpoint_path.format(epoch=0))

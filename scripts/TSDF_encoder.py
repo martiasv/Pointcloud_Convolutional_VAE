@@ -34,14 +34,14 @@ import cv2
 from cv_bridge import CvBridge
 
 class unordered_pointcloud_to_latent_space():
-    def __init__(self,pc_topic="/gagarin/tsdf_server/tsdf_pointcloud",lat_topic="/gagarin/pc_latent_space",recon_topic="/gagarin/reconstructed_pc",slice_pub="/gagarin/pc_slice",voxel_pub="/gagarin/voxel_pub"):
+    def __init__(self,pc_topic="/delta/tsdf_server/tsdf_pointcloud",lat_topic="/delta/pc_latent_space",recon_topic="/delta/reconstructed_pc",slice_pub="/delta/pc_slice",voxel_pub="/delta/voxel_pub"):
 
         #Import model weight path
         self.arg_filepath = rospy.get_param("~model_weight_path")
         print('__file__:    ', __file__)
 
         #Load the network
-        self.vae = MCVAE.VAE()
+        self.vae = CVAE.VAE()
         self.vae.compile(optimizer=keras.optimizers.Adam())
         self.vae.load_weights(self.arg_filepath)
         self.latent_space_dim = self.vae.latent_dim
@@ -171,7 +171,7 @@ class unordered_pointcloud_to_latent_space():
                     marker.scale.x = 0.14
                     marker.scale.y = 0.14
                     marker.scale.z = 0.14
-                    marker.color.a = 1-markers[3]
+                    marker.color.a = 1- markers[3]
                     marker.color.r = 255
                     marker.color.g = 0
                     marker.color.b = 0
