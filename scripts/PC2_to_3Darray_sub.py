@@ -14,7 +14,7 @@ import pickle
 
 
 class unordered_pointcloud_to_3Darray_dataset():
-    def __init__(self,pc_topic="/delta/tsdf_server/tsdf_pointcloud"):
+    def __init__(self,pc_topic="/tsdf_server/tsdf_pointcloud"):
         self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_callback)
         self.XYZI_pointclouds = []
         self.count = 0
@@ -27,10 +27,6 @@ class unordered_pointcloud_to_3Darray_dataset():
         arr = np.array(ros_np.point_cloud2.pointcloud2_to_array(pc).tolist())
         end_time_1 = time.monotonic()
 
-        if self.count ==20:
-            with open(f'src/pointcloud_utils/pickelled/single_pointcloud_arr.pickle', 'wb') as f:
-                pickle.dump(arr, f, pickle.HIGHEST_PROTOCOL)
-                print("Done pickling the single pointcloud")
 
         #Loop 2 is fast
         start_time_2 = time.monotonic()
@@ -68,7 +64,7 @@ class unordered_pointcloud_to_3Darray_dataset():
         self.XYZI_pointclouds.append(xyzi)
         print(f'{self.count} pointclouds')
         if len(self.XYZI_pointclouds)%1000==0:
-            with open(f'src/pointcloud_utils/pickelled/random_corridor_yawless/raw/pointclouds_batch{self.count//1000}.pickle', 'wb') as f:
+            with open(f'src/pointcloud_utils/pickelled/random_corridor_yawless_spawn/raw/pointclouds_batch{self.count//1000+132}.pickle', 'wb') as f:
                 pickle.dump(self.XYZI_pointclouds, f, pickle.HIGHEST_PROTOCOL)
             print(f'Batch {self.count//1000}: Pickling complete')
             self.XYZI_pointclouds = []

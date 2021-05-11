@@ -12,7 +12,6 @@ import ros_numpy as ros_np
 from sensor_msgs.msg import PointCloud2
 from sensor_msgs.msg import PointField
 from sensor_msgs.msg import Image
-from visualization_msgs.msg import MarkerArray, Marker
 import rospy
 import numpy as np
 import time
@@ -21,9 +20,8 @@ import matplotlib.pyplot as plt
 import pickle
 import Convolutional_variational_autoencoder as CVAE
 import Minimal_convolutional_variational_autoencoder as MCVAE
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Float32MultiArray, Float32
 from std_msgs.msg import Header
-from geometry_msgs.msg import Quaternion
 import argparse
 import tensorflow as tf
 from tensorflow import keras
@@ -34,10 +32,9 @@ import cv2
 from cv_bridge import CvBridge
 
 class unordered_pointcloud_to_latent_space():
-    def __init__(self,pc_topic="/tsdf_server/tsdf_pointcloud",lat_topic="/pc_latent_space",recon_topic="/reconstructed_pc",slice_pub="/pc_slice",voxel_pub="/voxel_pub"):
-
-        #Get robot name
-        self.robot_name = rospy.get_param("/robot_name")
+    def __init__(self,pc_topic="/tsdf_server/tsdf_pointcloud",lat_topic="/delta/pc_latent_space",
+            recon_topic="/reconstructed_pc",slice_topic="/pc_slice", dist_topic="/delta/shortest_distance", 
+            bin_entropy_topic="/delta/bin_entropy",voxel_pub="/delta/voxel_pub"):
 
         #Import model weight path
         self.arg_filepath = rospy.get_param("~model_weight_path")
@@ -50,27 +47,46 @@ class unordered_pointcloud_to_latent_space():
         self.latent_space_dim = self.vae.latent_dim
 
         #Make subscriber and publisher
-        self.pc_sub = rospy.Subscriber('/'+self.robot_name+pc_topic,PointCloud2,self.point_cloud_encoder_callback)
+        self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_encoder_callback)
         self.lat_pub = rospy.Publisher(lat_topic,LatSpace,queue_size=None)
 
         #If reconstruct or not
         if rospy.get_param("~reconstruct_TSDF"):
             self.reconstruct = True
-            self.pc_pub = rospy.Publisher('/'+self.robot_name+recon_topic,PointCloud2,queue_size=1)
+            self.pc_pub = rospy.Publisher(recon_topic,PointCloud2,queue_size=1)
         else:
             self.reconstruct = False
+        
+        if rospy.get_param("~publish_distance"):
+            self.publish_distance = True
+            self.dist_pub = rospy.Publisher(dist_topic,Float32,queue_size=1)
+        else:
+            self.publish_distance = False
+
+        if rospy.get_param("~publish_bin_entropy"):
+            self.publish_bin_entropy = True
+            self.bin_entropy_pub = rospy.Publisher(bin_entropy_topic,Float32,queue_size=1)
+        else:
+            self.publish_bin_entropy = False
+
+
+        if rospy.get_param("~publish_distance"):
+            self.publish_distance = True
+            self.dist_pub = rospy.Publisher(dist_topic,Float32,queue_size=1)
+        else:
+            self.publish_distance = False
+        
+        if rospy.get_param("~publish_bin_entropy"):
+            self.publish_bin_entropy = True
+            self.bin_entropy_pub = rospy.Publisher(bin_entropy_topic,Float32,queue_size=1)
+        else:
+            self.publish_bin_entropy = False
 
         if rospy.get_param("~publish_slice"):
             self.pub_slice = True
-            self.slice_pub = rospy.Publisher('/'+self.robot_name+slice_pub,Image,queue_size=1)
+            self.slice_pub = rospy.Publisher(slice_topic,Image,queue_size=1)
         else:
             self.pub_slice = False
-
-        if rospy.get_param("~publish_voxels"):
-            self.pub_voxels = True
-            self.voxel_pub = rospy.Publisher('/'+self.robot_name+voxel_pub, MarkerArray,queue_size=1)
-        else:
-            self.pub_voxels = False
 
         self.bin_thresh = rospy.get_param("~binarization_threshold")
 
@@ -114,6 +130,11 @@ class unordered_pointcloud_to_latent_space():
         msg = LatSpace(latent_space=latent_space[0].tolist()[0])
         self.lat_pub.publish(msg)
 
+        if (self.publish_distance == True):
+            shortest_distance = self.find_closest_distance(arr)
+            dist_msg = Float32(shortest_distance)
+            self.dist_pub.publish(dist_msg)
+
         #Reconstruct and publish reconstructed pointcloud
         if self.reconstruct == True:
             #Do inference
@@ -133,6 +154,13 @@ class unordered_pointcloud_to_latent_space():
             C = C - (scale_factor*27)
             T = T - (scale_factor*8)
 
+            if(self.publish_bin_entropy == True):
+                true_tsdf = binarized
+                binary_crossentropy = self.find_binary_crossentropy(true_tsdf, output_image) #Extracting a 3D neighborhood around the drone
+                print("Binary_crossentropy: ", binary_crossentropy)
+                bin_entropy_msg = Float32(binary_crossentropy)
+                self.bin_entropy_pub.publish(bin_entropy_msg)
+            
             #Create fields
             fields = [PointField('x', 0, PointField.FLOAT32, 1),
                     PointField('y', 4, PointField.FLOAT32, 1),
@@ -141,7 +169,7 @@ class unordered_pointcloud_to_latent_space():
 
             #Create the header
             header = Header()
-            header.frame_id = self.robot_name+"/base_link"
+            header.frame_id = "delta/base_link"
             header.stamp = rospy.Time.now()
 
             #Create the points
@@ -154,10 +182,10 @@ class unordered_pointcloud_to_latent_space():
             self.pc_pub.publish(output_pc)
             rospy.loginfo("Published Encoded-Decoded pointcloud")
 
-            #Flip image to match flying direction
-            flipped_output_image = np.flip(np.flip(cropped_output_image,axis=1),axis=0)
             if self.pub_slice == True:
-                image_temp  = CvBridge().cv2_to_imgmsg(flipped_output_image[:,:,8])
+                #Flip image to match flying direction
+                flipped_output_image = np.flip(np.flip(cropped_output_image[:,:,8],axis=1),axis=0)
+                image_temp  = CvBridge().cv2_to_imgmsg(flipped_output_image)
                 image_temp.header = header
                 self.slice_pub.publish(image_temp)
                 rospy.loginfo("Published Encoded-Decoded image slice")
@@ -190,6 +218,50 @@ class unordered_pointcloud_to_latent_space():
                     markerarray.markers.append(marker)
                 self.voxel_pub.publish(markerarray)
                 rospy.loginfo("Published Encoded-Decoded voxels")
+
+    def find_binary_crossentropy(self, tsdf_true, tsdf_pred):
+        print("Tsdf true: ", tsdf_true.shape, "\nTsdf pred: ", tsdf_pred.shape)
+        #center_of_tsdf = [26,26,8]
+        tsdf_true_minimal_cube = tsdf_true[23:29,23:29,6:10] #Taking the 7x7x5 cube of the pointcloud
+
+        tsdf_pred_minimal_cube = tsdf_pred[23:29,23:29,6:10]
+        
+        binary_loss_matrix = tf.keras.losses.binary_crossentropy(tsdf_true_minimal_cube, tsdf_pred_minimal_cube)
+        binary_loss_tensor = tf.math.reduce_mean(binary_loss_matrix)
+        binary_loss = float(binary_loss_tensor)
+        return binary_loss
+
+
+    def find_error_in_representations(self, tsdf_true, tsdf_pred):
+        print("Tsdf true: ", tsdf_true.shape, "\nTsdf pred: ", tsdf_pred.shape)
+        #center_of_tsdf = [26,26,8]
+        tsdf_true_minimal_cube = tsdf_true[23:29,23:29,6:10] #Taking the 7x7x5 cube of the pointcloud
+
+        tsdf_pred_minimal_cube = tsdf_pred[23:29,23:29,6:10]
+        
+        binary_loss_matrix = tf.keras.losses.binary_crossentropy(tsdf_true_minimal_cube, tsdf_pred_minimal_cube)
+        binary_loss_tensor = tf.math.reduce_mean(binary_loss_matrix)
+        binary_loss = float(binary_loss_tensor)
+        return binary_loss
+
+
+    def find_closest_distance(self,tsdf_true):
+
+        tsdf_true_minimal_cube = tsdf_true[np.where((tsdf_true[:,0] >-0.6) & (tsdf_true[:,0] < 0.6)
+                    & (tsdf_true[:,1] >-0.6) & (tsdf_true[:,1] < 0.6)
+                    & (tsdf_true[:,2] >-0.6) & (tsdf_true[:,2] < 0.6)
+                    & (tsdf_true[:,3] >-0.02) & (tsdf_true[:,3] < 0.15))]  #0.15 from the front and a small margin of error from the back
+
+        shortest_distance = 10
+        for row in tsdf_true_minimal_cube:
+            dist = np.sqrt(row[0]**2 + row[1]**2 + row[2]**2) #Euclidean distance
+            if (dist < shortest_distance):
+                shortest_distance = dist
+
+        if(shortest_distance == 10):
+            return 0
+
+        return shortest_distance
 
 
 
