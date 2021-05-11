@@ -69,7 +69,7 @@ class VAE(keras.Model):
         x = encoder_inputs
         for idx in range(len(self.encoder_conv_filters)):
             x = layers.Conv3D(self.encoder_conv_filters[idx], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
-        #x = layers.MaxPooling3D(pool_size=(2,2,2))(x)
+        x = layers.MaxPooling3D(pool_size=(2,2,2))(x)
         x = layers.Flatten()(x)
         x = layers.Dense(self.encoder_dense_layers[0])(x)
         x = layers.Dense(self.encoder_dense_layers[1])(x)
@@ -86,7 +86,7 @@ class VAE(keras.Model):
         x = layers.Dense(self.decoder_dense_layers[1], activation=self.activation_function)(x)
         x = layers.Dense(self.decoder_dense_layers[2], activation=self.activation_function)(x)
         x = layers.Reshape((8, 8, 2, 64))(x)
-        #x = layers.UpSampling3D(size=(2,2,2))(x)
+        x = layers.UpSampling3D(size=(2,2,2))(x)
         for idx in range(len(self.decoder_conv_filters)):
             x = layers.Conv3DTranspose(self.decoder_conv_filters[idx], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
         decoder_outputs = layers.Conv3DTranspose(1, self.kernel_size, activation=self.output_activation_function, padding=self.padding)(x) #Stride 1 for collapsing into correct dimensions
