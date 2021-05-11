@@ -34,38 +34,41 @@ import cv2
 from cv_bridge import CvBridge
 
 class unordered_pointcloud_to_latent_space():
-    def __init__(self,pc_topic="/gagarin/tsdf_server/tsdf_pointcloud",lat_topic="/gagarin/pc_latent_space",recon_topic="/gagarin/reconstructed_pc",slice_pub="/gagarin/pc_slice",voxel_pub="/gagarin/voxel_pub"):
+    def __init__(self,pc_topic="/tsdf_server/tsdf_pointcloud",lat_topic="/pc_latent_space",recon_topic="/reconstructed_pc",slice_pub="/pc_slice",voxel_pub="/voxel_pub"):
+
+        #Get robot name
+        self.robot_name = rospy.get_param("/robot_name")
 
         #Import model weight path
         self.arg_filepath = rospy.get_param("~model_weight_path")
         print('__file__:    ', __file__)
 
         #Load the network
-        self.vae = MCVAE.VAE()
+        self.vae = CVAE.VAE()
         self.vae.compile(optimizer=keras.optimizers.Adam())
         self.vae.load_weights(self.arg_filepath)
         self.latent_space_dim = self.vae.latent_dim
 
         #Make subscriber and publisher
-        self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_encoder_callback)
+        self.pc_sub = rospy.Subscriber('/'+self.robot_name+pc_topic,PointCloud2,self.point_cloud_encoder_callback)
         self.lat_pub = rospy.Publisher(lat_topic,LatSpace,queue_size=None)
 
         #If reconstruct or not
         if rospy.get_param("~reconstruct_TSDF"):
             self.reconstruct = True
-            self.pc_pub = rospy.Publisher(recon_topic,PointCloud2,queue_size=1)
+            self.pc_pub = rospy.Publisher('/'+self.robot_name+recon_topic,PointCloud2,queue_size=1)
         else:
             self.reconstruct = False
 
         if rospy.get_param("~publish_slice"):
             self.pub_slice = True
-            self.slice_pub = rospy.Publisher(slice_pub,Image,queue_size=1)
+            self.slice_pub = rospy.Publisher('/'+self.robot_name+slice_pub,Image,queue_size=1)
         else:
             self.pub_slice = False
 
         if rospy.get_param("~publish_voxels"):
             self.pub_voxels = True
-            self.voxel_pub = rospy.Publisher(voxel_pub, MarkerArray,queue_size=1)
+            self.voxel_pub = rospy.Publisher('/'+self.robot_name+voxel_pub, MarkerArray,queue_size=1)
         else:
             self.pub_voxels = False
 
@@ -138,7 +141,7 @@ class unordered_pointcloud_to_latent_space():
 
             #Create the header
             header = Header()
-            header.frame_id = "gagarin/base_link"
+            header.frame_id = self.robot_name+"/base_link"
             header.stamp = rospy.Time.now()
 
             #Create the points
@@ -171,7 +174,7 @@ class unordered_pointcloud_to_latent_space():
                     marker.scale.x = 0.14
                     marker.scale.y = 0.14
                     marker.scale.z = 0.14
-                    marker.color.a = 1-markers[3]
+                    marker.color.a = 1- markers[3]
                     marker.color.r = 255
                     marker.color.g = 0
                     marker.color.b = 0

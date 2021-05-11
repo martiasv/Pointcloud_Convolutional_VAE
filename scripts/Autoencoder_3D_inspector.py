@@ -16,7 +16,7 @@ from tensorflow.keras import layers
 import Convolutional_variational_autoencoder as CVAE
 
 class autoencoder_pc_reconstruction():
-    def __init__(self,pc_topic="/gagarin/tsdf_server/tsdf_pointcloud",recon_pc="/gagarin/reconstructed_pc"):
+    def __init__(self,pc_topic="/delta/tsdf_server/tsdf_pointcloud",recon_pc="/delta/reconstructed_pc"):
 
         #Parse arguments
         self.parser = argparse.ArgumentParser(description="Model weight parser")

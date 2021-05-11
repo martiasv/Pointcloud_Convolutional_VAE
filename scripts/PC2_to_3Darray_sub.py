@@ -14,7 +14,7 @@ import pickle
 
 
 class unordered_pointcloud_to_3Darray_dataset():
-    def __init__(self,pc_topic="/gagarin/tsdf_server/tsdf_pointcloud"):
+    def __init__(self,pc_topic="/delta/tsdf_server/tsdf_pointcloud"):
         self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_callback)
         self.XYZI_pointclouds = []
         self.count = 0
@@ -26,6 +26,11 @@ class unordered_pointcloud_to_3Darray_dataset():
         xyzi = np.zeros((65,65,16))
         arr = np.array(ros_np.point_cloud2.pointcloud2_to_array(pc).tolist())
         end_time_1 = time.monotonic()
+
+        if self.count ==20:
+            with open(f'src/pointcloud_utils/pickelled/single_pointcloud_arr.pickle', 'wb') as f:
+                pickle.dump(arr, f, pickle.HIGHEST_PROTOCOL)
+                print("Done pickling the single pointcloud")
 
         #Loop 2 is fast
         start_time_2 = time.monotonic()
