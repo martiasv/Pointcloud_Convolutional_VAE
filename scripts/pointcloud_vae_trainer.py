@@ -13,29 +13,12 @@ import glob
 import os
 import time
 
-""" def load_batches(name):
-    decoded = name.decode("UTF-8")
-    if os.path.exists(name):
-        with open(decoded,'rb') as f:
-            empty_pcl = np.zeros((65,65,16,1))
-            loaded_pickle = pickle.load(f)
-            empty_pcl = loaded_pickle
-            
-            return loaded_pickle[:,:64,64,:,:] """
 
 #Load the batches of training data
 
-""" path = "../pickelled/randomized_11_may/training/shuffled"
-pkl_files = glob.glob("../pickelled/randomized_11_may/training/shuffled/pointclouds_batch*.pickle")
-print(f'Length of pkl files: {len(pkl_files)}')
-dataset = tf.data.Dataset.from_tensor_slices((pkl_files))
-dataset = dataset.map(
-    lambda filename: tf.py_function(load_batches, inp=[filename], Tout=tf.float64)
-) """
-
 train_path = path = "../pickelled/randomized_11_may/training/shuffled"
 train_data = []
-num_train_batches = 2
+num_train_batches = 10
 
 for i in range(num_train_batches):
     with open(train_path+f"/pointclouds_batch{i}.pickle",'rb') as f:
@@ -66,10 +49,11 @@ print(vae.dataset_size)
 print(vae.batch_count)
 
 np.random.seed(int(time.time()))
-random_index = [np.random.uniform(low=0,high=1000*num_train_batches) for x in range(15)]
+random_index = [int(np.random.uniform(low=0,high=1000*num_train_batches)) for x in range(15)]
+print(random_index)
 
 #Inspection of input data
-for i in range(len(random_index)):
+for i in random_index:
     plt.imshow(training_dataset[i,:64,:64,8,0], cmap="gray") 
     plt.show()
 
