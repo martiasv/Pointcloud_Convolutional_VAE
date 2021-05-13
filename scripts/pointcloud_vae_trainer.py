@@ -18,7 +18,7 @@ import time
 
 train_path = path = "../pickelled/randomized_11_may/training/shuffled"
 train_data = []
-num_train_batches = 10
+num_train_batches = 2
 
 for i in range(num_train_batches):
     with open(train_path+f"/pointclouds_batch{i}.pickle",'rb') as f:
@@ -32,7 +32,7 @@ training_dataset = np.reshape(train_data, (1000*num_train_batches,65,65,16,1))
 
 val_path = "../pickelled/randomized_11_may/validation"
 validation_data = []
-num_val_batches = 2
+num_val_batches = 1
 for i in range(num_val_batches):
     with open(val_path+f"/shuffled/pointclouds_batch{i}.pickle",'rb') as f:
         arr = np.array(pickle.load(f))

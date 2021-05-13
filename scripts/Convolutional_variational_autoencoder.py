@@ -6,6 +6,7 @@ from datetime import date, time, datetime
 import os
 import io
 import math
+from sklearn.metrics import f1_score
 
 ##Create a sampling layer
 class Sampling(layers.Layer):
@@ -48,6 +49,7 @@ class VAE(keras.Model):
         self.total_loss_tracker = keras.metrics.Mean(name="total_loss")
         self.reconstruction_loss_tracker = keras.metrics.Mean(name="reconstruction_loss")
         self.kl_loss_tracker = keras.metrics.Mean(name="kl_loss")
+        self.f1_loss_tracker = keras.metrics.Mean(name="f1_loss")
 
         self.learning_rate = 0.001
         self.optimizer = keras.optimizers.Adam(learning_rate=self.learning_rate)
@@ -100,6 +102,7 @@ class VAE(keras.Model):
             self.total_loss_tracker,
             self.reconstruction_loss_tracker,
             self.kl_loss_tracker,
+            self.f1_loss_tracker,
         ]
 
     def train_step(self, data):
@@ -114,15 +117,27 @@ class VAE(keras.Model):
             kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
             kl_loss = tf.reduce_mean(tf.reduce_sum(kl_loss, axis=1))
             total_loss = reconstruction_loss + kl_loss
+
+            #Calculate F1 score
+            binarized_reconstruction = tf.cast(tf.math.greater(reconstruction,0.5), tf.uint8)
+            TP = tf.math.count_nonzero(data*binarized_reconstruction)
+            TN = tf.math.count_nonzero((binarized_reconstruction - 1) * (data - 1))
+            FP = tf.math.count_nonzero(binarized_reconstruction * (data - 1))
+            FN = tf.math.count_nonzero((binarized_reconstruction - 1) * data)
+            precision = tf.math.divide(TP,TP+FP)
+            recall = tf.math.divide(TP,TP+FN)
+            f1_loss = 2*tf.math.divide(precision*recall,precision+recall)
         grads = tape.gradient(total_loss, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
         self.total_loss_tracker.update_state(total_loss)
         self.reconstruction_loss_tracker.update_state(reconstruction_loss)
         self.kl_loss_tracker.update_state(kl_loss)
+        self.f1_loss_tracker.update_state(f1_loss)
         return {
             "loss": self.total_loss_tracker.result(),
             "reconstruction_loss": self.reconstruction_loss_tracker.result(),
             "kl_loss": self.kl_loss_tracker.result(),
+            "f1_loss": self.f1_loss_tracker.result()
         }
     def call(self,data):
         z_mean, z_log_var, z = self.encoder(data)
@@ -140,7 +155,9 @@ class VAE(keras.Model):
         kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
         kl_loss = tf.reduce_mean(tf.reduce_sum(kl_loss, axis=1))
         total_loss = reconstruction_loss + kl_loss
-        return {"loss":total_loss,"reconstruction_loss":reconstruction_loss,"kl_loss":kl_loss}
+        f1_loss = f1_score(np.array(data).ravel(),np.where(reconstruction > 0.5, 1,0).ravel())
+
+        return {"loss":total_loss,"reconstruction_loss":reconstruction_loss,"kl_loss":kl_loss,'f1_loss':f1_loss}
 
     def step_function(self,data):
         z_mean, z_log_var, z = self.encoder(data)
@@ -153,7 +170,8 @@ class VAE(keras.Model):
         kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
         kl_loss = tf.reduce_mean(tf.reduce_sum(kl_loss, axis=1))
         total_loss = reconstruction_loss + kl_loss
-        return {"loss":total_loss,"reconstruction_loss":reconstruction_loss,"kl_loss":kl_loss}
+        f1_loss = f1_score(np.array(data).ravel(),np.where(reconstruction > 0.5, 1,0).ravel())
+        return {"loss":total_loss,"reconstruction_loss":reconstruction_loss,"kl_loss":kl_loss,'f1_loss':f1_loss}
 
 
     def write_summary_to_file(self):
