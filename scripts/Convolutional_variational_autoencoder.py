@@ -26,19 +26,19 @@ class VAE(keras.Model):
         self.latent_dim = 50
         #self.tensor_input_shape = (64, 64, 24, 1)
         self.batch_size = 256
-        self.epochs  = 64
+        self.epochs  = 256
         self.activation_function = "relu"
         self.output_activation_function = "sigmoid"
         self.kernel_size = 3
         self.strides = 2
         self.padding = "same"
-        self.encoder_conv_filters = [16,32,64]
+        self.encoder_conv_filters = [8,16,32]
         self.encoder_dense_layers = [512,256]
-        self.decoder_conv_filters = [64,32,16]
-        self.decoder_dense_layers = [256,512,8*8*2*64]
+        self.decoder_conv_filters = [32,16,8]
+        self.decoder_dense_layers = [256,512,4*4*1*64]
         self.save_freq = 8 #Save after this many epochs
         self.dataset_size = dataset_size
-        self.validation_split = 0.2
+        self.validation_split = 0
         self.batch_count = math.ceil((self.dataset_size*(1-self.validation_split))/self.batch_size)
         self.encoder = self.build_encoder()
         self.decoder = self.build_decoder()
@@ -85,7 +85,7 @@ class VAE(keras.Model):
         x = layers.Dense(self.decoder_dense_layers[0], activation=self.activation_function)(latent_inputs)
         x = layers.Dense(self.decoder_dense_layers[1], activation=self.activation_function)(x)
         x = layers.Dense(self.decoder_dense_layers[2], activation=self.activation_function)(x)
-        x = layers.Reshape((8, 8, 2, 64))(x)
+        x = layers.Reshape((4, 4, 1, 64))(x)
         x = layers.UpSampling3D(size=(2,2,2))(x)
         for idx in range(len(self.decoder_conv_filters)):
             x = layers.Conv3DTranspose(self.decoder_conv_filters[idx], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
@@ -141,9 +141,23 @@ class VAE(keras.Model):
         total_loss = reconstruction_loss + kl_loss
         return {"loss":total_loss,"reconstruction_loss":reconstruction_loss,"kl_loss":kl_loss}
 
+    def step_function(self,data):
+        z_mean, z_log_var, z = self.encoder(data)
+        reconstruction = self.decoder(z)
+        reconstruction_loss = tf.reduce_mean(
+            tf.reduce_sum(
+                self.loss_function(data, reconstruction), axis=(1, 2)
+            )
+        )
+        kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
+        kl_loss = tf.reduce_mean(tf.reduce_sum(kl_loss, axis=1))
+        total_loss = reconstruction_loss + kl_loss
+        return {"loss":total_loss,"reconstruction_loss":reconstruction_loss,"kl_loss":kl_loss}
+
+
     def write_summary_to_file(self):
         file1 = open(self.base_path+"/network_and_training_summary.txt","w")
-        Data_to_save = f'Latent space dimension:{self.latent_dim}\nActivation function:'+self.activation_function+f'\nConvolution kernel size:{self.kernel_size}\nConvolution strides:{self.strides}\nPadding:{self.padding}\nBatch size:{self.batch_size}\nEpochs:{self.epochs}\nOptimizer:{type(self.optimizer)}\nLearning rate:{self.learning_rate}\nThreshold for output:{self.output_threshold}\nLoss function: {self.loss_function}\nDataset dir:{self.dataset_dir}\n\nAutoencoder network summary:\nEncoder convolutional filters:{self.encoder_conv_filters}\nEncoder dense layers:{self.encoder_dense_layers}\n\nDecoder Convolutional filters:{self.decoder_conv_filters}\nDecoder dense layers:{self.decoder_dense_layers}\n'
+        Data_to_save = f'Latent space dimension:{self.latent_dim}\nActivation function:'+self.activation_function+f'\nConvolution kernel size:{self.kernel_size}\nConvolution strides:{self.strides}\nPadding:{self.padding}\nBatch size:{self.batch_size}\nEpochs:{self.epochs}\nOptimizer:{type(self.optimizer)}\nLearning rate:{self.learning_rate}\nLoss function: {self.loss_function}\nDataset dir:{self.dataset_dir}\n\nAutoencoder network summary:\nEncoder convolutional filters:{self.encoder_conv_filters}\nEncoder dense layers:{self.encoder_dense_layers}\n\nDecoder Convolutional filters:{self.decoder_conv_filters}\nDecoder dense layers:{self.decoder_dense_layers}\n'
         stringlist = []
         self.encoder.summary(line_length=120,print_fn=lambda x: stringlist.append(x))
         self.decoder.summary(line_length=120,print_fn=lambda x: stringlist.append(x))
