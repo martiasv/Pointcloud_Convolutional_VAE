@@ -18,3 +18,6 @@ scripts/__pycache__/*
 
 #Ignore eval images
 eval_images/**
+
+#Ignore vscode files
+.vscode/**

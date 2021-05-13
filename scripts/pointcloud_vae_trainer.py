@@ -1,5 +1,5 @@
 ##Setup
-import pickle
+import pickle5 as pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
@@ -11,6 +11,7 @@ import argparse
 import math
 import glob
 import os
+import time
 
 """ def load_batches(name):
     decoded = name.decode("UTF-8")
@@ -34,7 +35,7 @@ dataset = dataset.map(
 
 train_path = path = "../pickelled/randomized_11_may/training/shuffled"
 train_data = []
-num_train_batches = 100
+num_train_batches = 2
 
 for i in range(num_train_batches):
     with open(train_path+f"/pointclouds_batch{i}.pickle",'rb') as f:
@@ -48,7 +49,7 @@ training_dataset = np.reshape(train_data, (1000*num_train_batches,65,65,16,1))
 
 val_path = "../pickelled/randomized_11_may/validation"
 validation_data = []
-num_val_batches = 20
+num_val_batches = 2
 for i in range(num_val_batches):
     with open(val_path+f"/shuffled/pointclouds_batch{i}.pickle",'rb') as f:
         arr = np.array(pickle.load(f))
@@ -64,18 +65,19 @@ vae.compile(optimizer=vae.optimizer)
 print(vae.dataset_size)
 print(vae.batch_count)
 
-random_index = [np.random.uniform(low=0,high=1000*num_val_batches) for x in range(15)]
+np.random.seed(int(time.time()))
+random_index = [np.random.uniform(low=0,high=1000*num_train_batches) for x in range(15)]
 
 #Inspection of input data
 for i in range(len(random_index)):
-    plt.imshow(validation_dataset[i,:64,:64,8,0], cmap="gray") 
+    plt.imshow(training_dataset[i,:64,:64,8,0], cmap="gray") 
     plt.show()
 
 
 #Train
 vae.save_weights(vae.checkpoint_path.format(epoch=0))
 vae.write_summary_to_file()
-vae.fit(training_dataset[:,:64,:64,:,:], epochs=vae.epochs, batch_size=vae.batch_size,callbacks=[vae.cp_callback, vae.tensorboard_callback])
+vae.fit(training_dataset[:,:64,:64,:,:],validation_data=(validation_dataset[:,:64,:64,:,:],validation_dataset[:,:64,:64,:,:]),sample_weight=np.array([0.6,0.4]), epochs=vae.epochs, batch_size=vae.batch_size,callbacks=[vae.cp_callback, vae.tensorboard_callback])
 
 ##Do inference to monitor results
 input_pc = np.array([validation_dataset[0,:64,:64,:,:]])

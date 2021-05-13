@@ -129,6 +129,7 @@ class VAE(keras.Model):
         return self.decoder(z_mean)
 
     def test_step(self,data):
+        data = data[0] # We only want the first tensor in the tuple
         z_mean, z_log_var, z = self.encoder(data)
         reconstruction = self.decoder(z)
         reconstruction_loss = tf.reduce_mean(
