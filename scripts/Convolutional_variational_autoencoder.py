@@ -184,20 +184,6 @@ class VAE(keras.Model):
             "recall": recall,
         }
 
-    # def step_function(self,data):
-    #     z_mean, z_log_var, z = self.encoder(data)
-    #     reconstruction = self.decoder(z)
-    #     reconstruction_loss = tf.reduce_mean(
-    #         tf.reduce_sum(
-    #             self.loss_function(data, reconstruction), axis=(1, 2)
-    #         )
-    #     )
-    #     kl_loss = -0.5 * (1 + z_log_var - tf.square(z_mean) - tf.exp(z_log_var))
-    #     kl_loss = tf.reduce_mean(tf.reduce_sum(kl_loss, axis=1))
-    #     total_loss = reconstruction_loss + kl_loss
-    #     f1_loss = f1_score(np.array(data).ravel(),np.where(reconstruction > 0.5, 1,0).ravel())
-    #     return {"loss":total_loss,"reconstruction_loss":reconstruction_loss,"kl_loss":kl_loss,'f1_loss':f1_loss}
-
 
     def write_summary_to_file(self):
         file1 = open(self.base_path+"/network_and_training_summary.txt","w")
