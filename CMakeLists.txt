@@ -28,6 +28,11 @@ add_message_files(
   LatSpace.msg
 )
 
+add_service_files(
+  FILES
+  scramble.srv
+)
+
 generate_messages()
 
 catkin_package(
@@ -40,7 +45,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-catkin_install_python(PROGRAMS scripts/gazebo_env_scrambler.py
+catkin_install_python(PROGRAMS scripts/gazebo_env_scrambler.py scripts/overfitted_gazebo_env_scrambler.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

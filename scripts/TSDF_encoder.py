@@ -20,7 +20,7 @@ from datetime import timedelta
 import matplotlib.pyplot as plt
 import pickle
 import Convolutional_variational_autoencoder as CVAE
-import Minimal_convolutional_variational_autoencoder as MCVAE
+#import Minimal_convolutional_variational_autoencoder as MCVAE
 from std_msgs.msg import Float32MultiArray
 from std_msgs.msg import Header
 from geometry_msgs.msg import Quaternion

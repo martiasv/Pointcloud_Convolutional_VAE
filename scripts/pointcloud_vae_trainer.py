@@ -6,7 +6,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 import Convolutional_variational_autoencoder as CVAE
-import Minimal_convolutional_variational_autoencoder as MCVAE
+#import Minimal_convolutional_variational_autoencoder as MCVAE
 import argparse
 import math
 import glob

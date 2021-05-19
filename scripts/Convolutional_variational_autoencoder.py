@@ -24,7 +24,7 @@ class Sampling(layers.Layer):
 class VAE(keras.Model):
     def __init__(self, dataset_size=20, **kwargs):
         super(VAE, self).__init__(**kwargs)
-        self.latent_dim = 50
+        self.latent_dim = 100
         #self.tensor_input_shape = (64, 64, 24, 1)
         self.batch_size = 256
         self.epochs  = 256
