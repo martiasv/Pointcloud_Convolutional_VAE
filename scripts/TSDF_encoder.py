@@ -34,7 +34,8 @@ import cv2
 from cv_bridge import CvBridge
 
 class unordered_pointcloud_to_latent_space():
-    def __init__(self,pc_topic="/tsdf_server/tsdf_pointcloud",lat_topic="/pc_latent_space",recon_topic="/reconstructed_pc",slice_pub="/pc_slice",voxel_pub="/voxel_pub"):
+    def __init__(self,pc_topic="/tsdf_server/tsdf_pointcloud",lat_topic="/delta/pc_latent_space",recon_topic="/reconstructed_pc",
+    slice_pub="/pc_slice",voxel_pub="/voxel_pub"):
 
         #Get robot name
         self.robot_name = rospy.get_param("/robot_name")
@@ -48,21 +49,21 @@ class unordered_pointcloud_to_latent_space():
         self.vae.compile(optimizer=keras.optimizers.Adam())
         self.vae.load_weights(self.arg_filepath)
         self.latent_space_dim = self.vae.latent_dim
-
+        
         #Make subscriber and publisher
-        self.pc_sub = rospy.Subscriber('/'+self.robot_name+pc_topic,PointCloud2,self.point_cloud_encoder_callback)
+        self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_encoder_callback)
         self.lat_pub = rospy.Publisher(lat_topic,LatSpace,queue_size=None)
 
         #If reconstruct or not
         if rospy.get_param("~reconstruct_TSDF"):
             self.reconstruct = True
-            self.pc_pub = rospy.Publisher('/'+self.robot_name+recon_topic,PointCloud2,queue_size=1)
+            self.pc_pub = rospy.Publisher(recon_topic,PointCloud2,queue_size=1)
         else:
             self.reconstruct = False
 
         if rospy.get_param("~publish_slice"):
             self.pub_slice = True
-            self.slice_pub = rospy.Publisher('/'+self.robot_name+slice_pub,Image,queue_size=1)
+            self.slice_pub = rospy.Publisher(slice_pub,Image,queue_size=1)
         else:
             self.pub_slice = False
 
@@ -78,7 +79,7 @@ class unordered_pointcloud_to_latent_space():
     def point_cloud_encoder_callback(self,pc):
         #Initalize empty array for TSDF to fill
         xyzi = np.zeros((65,65,16))
-
+        
         #Convert from pointcloud2 to numpy array
         arr = np.array(ros_np.point_cloud2.pointcloud2_to_array(pc).tolist())
 
@@ -161,6 +162,7 @@ class unordered_pointcloud_to_latent_space():
                 image_temp.header = header
                 self.slice_pub.publish(image_temp)
                 rospy.loginfo("Published Encoded-Decoded image slice")
+                print("Published Encoded-Decoded image slice")
 
             if self.pub_voxels == True:
                 markerarray = MarkerArray()

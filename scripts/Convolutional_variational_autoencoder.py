@@ -6,7 +6,7 @@ from datetime import date, time, datetime
 import os
 import io
 import math
-from sklearn.metrics import f1_score
+
 
 ##Create a sampling layer
 class Sampling(layers.Layer):
@@ -24,7 +24,7 @@ class Sampling(layers.Layer):
 class VAE(keras.Model):
     def __init__(self, dataset_size=20, **kwargs):
         super(VAE, self).__init__(**kwargs)
-        self.latent_dim = 100
+        self.latent_dim = 50
         #self.tensor_input_shape = (64, 64, 24, 1)
         self.batch_size = 256
         self.epochs  = 256
@@ -33,10 +33,10 @@ class VAE(keras.Model):
         self.kernel_size = 3
         self.strides = 2
         self.padding = "same"
-        self.encoder_conv_filters = [8,16,32]
-        self.encoder_dense_layers = [512,256]
-        self.decoder_conv_filters = [32,16,8]
-        self.decoder_dense_layers = [256,512,4*4*1*64]
+        self.encoder_conv_filters = [8,16,32,64]
+        self.encoder_dense_layers = [256,128]
+        self.decoder_conv_filters = [64,32,16,8]
+        self.decoder_dense_layers = [128,256,1024]
         self.save_freq = 8 #Save after this many epochs
         self.dataset_size = dataset_size
         self.validation_split = 0
@@ -73,7 +73,7 @@ class VAE(keras.Model):
         x = encoder_inputs
         for idx in range(len(self.encoder_conv_filters)):
             x = layers.Conv3D(self.encoder_conv_filters[idx], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
-        x = layers.MaxPooling3D(pool_size=(2,2,2))(x)
+        # x = layers.MaxPooling3D(pool_size=(2,2,2))(x)
         x = layers.Flatten()(x)
         x = layers.Dense(self.encoder_dense_layers[0])(x)
         x = layers.Dense(self.encoder_dense_layers[1])(x)
@@ -90,7 +90,7 @@ class VAE(keras.Model):
         x = layers.Dense(self.decoder_dense_layers[1], activation=self.activation_function)(x)
         x = layers.Dense(self.decoder_dense_layers[2], activation=self.activation_function)(x)
         x = layers.Reshape((4, 4, 1, 64))(x)
-        x = layers.UpSampling3D(size=(2,2,2))(x)
+        # x = layers.UpSampling3D(size=(2,2,2))(x)
         for idx in range(len(self.decoder_conv_filters)):
             x = layers.Conv3DTranspose(self.decoder_conv_filters[idx], self.kernel_size, activation=self.activation_function, strides=self.strides, padding=self.padding)(x)
         decoder_outputs = layers.Conv3DTranspose(1, self.kernel_size, activation=self.output_activation_function, padding=self.padding)(x) #Stride 1 for collapsing into correct dimensions
