@@ -32,6 +32,7 @@ from pointcloud_utils.msg import LatSpace
 import os
 import cv2
 from cv_bridge import CvBridge
+import math
 
 class unordered_pointcloud_to_latent_space():
     def __init__(self,pc_topic="/tsdf_server/tsdf_pointcloud",lat_topic="/pc_latent_space",recon_topic="/reconstructed_pc",slice_pub="/pc_slice",voxel_pub="/voxel_pub"):
@@ -52,6 +53,8 @@ class unordered_pointcloud_to_latent_space():
         #Make subscriber and publisher
         self.pc_sub = rospy.Subscriber('/'+self.robot_name+pc_topic,PointCloud2,self.point_cloud_encoder_callback)
         self.lat_pub = rospy.Publisher(lat_topic,LatSpace,queue_size=None)
+
+        self.ctr = 0
 
         #If reconstruct or not
         if rospy.get_param("~reconstruct_TSDF"):
@@ -116,6 +119,7 @@ class unordered_pointcloud_to_latent_space():
 
         #Reconstruct and publish reconstructed pointcloud
         if self.reconstruct == True:
+            self.ctr +=1
             #Do inference
             output_image = self.vae.decoder.predict(latent_space[0])[0,:,:,:]
 
@@ -148,7 +152,11 @@ class unordered_pointcloud_to_latent_space():
             points = np.array([R.ravel(),C.ravel(),T.ravel(),cropped_output_image.ravel()]).reshape(4,-1).T
 
             #Create the PointCloud2
-            output_pc = pc2.create_cloud(header,fields,points)
+            filtered_points = points[points[:,2]<1.4]
+            filtered_points = filtered_points[(np.sqrt(filtered_points[:,0]**2+filtered_points[:,1]**2))<(scale_factor*24)] #Remove all points outside the circle
+            filtered_points = filtered_points[(np.sqrt(filtered_points[:,0]**2+filtered_points[:,1]**2))>abs(3*filtered_points[:,2]+0.3)] #Remove all the points in the unobservable cones of the LiDAR
+            filtered_points = filtered_points[filtered_points[:,3]<0.3]
+            output_pc = pc2.create_cloud(header,fields,filtered_points)
 
             #Publish pointcloud
             self.pc_pub.publish(output_pc)
@@ -162,9 +170,12 @@ class unordered_pointcloud_to_latent_space():
                 self.slice_pub.publish(image_temp)
                 rospy.loginfo("Published Encoded-Decoded image slice")
 
-            if self.pub_voxels == True:
+            if self.pub_voxels == True and (self.ctr%10==0):
                 markerarray = MarkerArray()
-                filtered_points = points[points[:,3]<0.3]
+                filtered_points = points[points[:,2]<1.4]
+                filtered_points = filtered_points[(np.sqrt(filtered_points[:,0]**2+filtered_points[:,1]**2))<(scale_factor*26)] #Remove all points outside the circle
+                filtered_points = filtered_points[(np.sqrt(filtered_points[:,0]**2+filtered_points[:,1]**2))>abs(3.5*filtered_points[:,2]+0.2)] #Remove all the points in the unobservable cones of the LiDAR
+                filtered_points = filtered_points[filtered_points[:,3]<0.3]
                 marker_ctr = 0
                 for markers in filtered_points:
                     marker = Marker()
@@ -175,9 +186,14 @@ class unordered_pointcloud_to_latent_space():
                     marker.scale.y = 0.14
                     marker.scale.z = 0.14
                     marker.color.a = 1- markers[3]
-                    marker.color.r = 255
-                    marker.color.g = 0
-                    marker.color.b = 0
+                    normalized_z_value = ((markers[2]+1.4)*255)/2.8
+                    marker.color.r = round(math.sin(0.024 * normalized_z_value + 0) * 127 + 128)*0.8
+                    marker.color.g = round(math.sin(0.024 * normalized_z_value + 2) * 127 + 128)*0.8
+                    marker.color.b = round(math.sin(0.024 * normalized_z_value + 4) * 127 + 128)*0.8
+                    #i = (val * 255 / max_val);
+                    # r = round(math.sin(0.024 * i + 0) * 127 + 128);
+                    # g = round(math.sin(0.024 * i + 2) * 127 + 128);
+                    # b = round(math.sin(0.024 * i + 4) * 127 + 128);
                     marker.id = marker_ctr
                     marker_ctr +=1
                     marker.pose.position.x = markers[0]
