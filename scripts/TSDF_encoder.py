@@ -35,7 +35,7 @@ from cv_bridge import CvBridge
 import math
 
 class unordered_pointcloud_to_latent_space():
-    def __init__(self,pc_topic="/tsdf_server/tsdf_pointcloud",lat_topic="/delta/pc_latent_space",recon_topic="/reconstructed_pc",
+    def __init__(self,pc_topic="gagarin/tsdf_server/tsdf_pointcloud",lat_topic="/gagarin/pc_latent_space",recon_topic="/reconstructed_pc",
     slice_pub="/pc_slice",voxel_pub="/voxel_pub"):
 
         #Get robot name

@@ -6,6 +6,7 @@ pickelled/tunnel/**
 pickelled/large_obstacle_tunnel/**
 pickelled/**
 
+
 #Ignore all model weights
 saved_model_weights/**
 
@@ -15,6 +16,10 @@ logs/**
 #Ignore all pycache files
 scripts/__pycache__/**
 scripts/__pycache__/*
+__pycache__/**
+
+#Ignore encoder model
+encoder_model/**
 
 #Ignore eval images
 eval_images/**
