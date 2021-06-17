@@ -12,9 +12,9 @@ The validity of the validation dataset used for monitoring overfitting also need
 
 2. The second step consists in shuffling the dataset across training batches using **dataset_shuffler.py**. This makes sure that all the different pickle-files are randomized across the whole dataset. This means that the training of the CVAE itself will be more stable, and that one can vary the number of training batches fed to the CVAE because they all have the same distribution of pointcloud samples. 
 
-3. The third step consists in training the CVAE using the script **pointcloud_vae_trainer.py**. The CVAE itself is defined in the script **Convolutional_variational_autoencoder.py**, and this is where one can make changes of the CVAE structure before proceeding to the training process. The training process can be visualized using Tensorboard, and here one can observe the training reconstruction loss, training KL-loss, training total loss, validation reconstruction loss, validation KL-loss, validation total loss. Training should not proceed after the 
+3. The third step consists in training the CVAE using the script **pointcloud_vae_trainer.py**. The CVAE itself is defined in the script **Convolutional_variational_autoencoder.py**, and this is where one can make changes of the CVAE structure before proceeding to the training process. The training process can be visualized using Tensorboard, and here one can observe the training reconstruction loss, training KL-loss, training total loss, validation reconstruction loss, validation KL-loss, validation total loss. Training should not proceed after the training loss and the validation loss have diverged.
 
-4. The last step is loading the trained weights into the CVAE model in the **TSDF_encoder.py**. This ROS-node will perform the real-time encoding of TSDF pointclouds from the TSDF_server of the Voxblox package. The compressed latent space representation is published on a topic that a Learning-Based agent subscribes to. This node also includes functionality for real-time visualization of the reconstructed pointcloud using the Decoder of the CVAE structure. This serves as a strong indication as to what features are present in the compressed latent space representation
+4. The last step is loading the trained weights into the CVAE model in the **TSDF_encoder.py**. This ROS-node will perform the real-time encoding of TSDF pointclouds from the TSDF_server of the Voxblox package. The compressed latent space representation is published on a topic that a Learning-Based agent subscribes to. This node also includes functionality for real-time visualization of the reconstructed pointcloud using the Decoder of the CVAE structure. This serves as a strong indication as to what features are present in the compressed latent space representation. 
 
 
 Input pointcloud from the TSDF_server       |  Reconstructed pointcloud from the CVAE
@@ -28,5 +28,7 @@ A script for randomly scrambling the positions of the obstacles is also included
 
 ## Versions
 ROS1 Melodic Morenia
+
 Python 3.6.9
+
 Tensorflow 2.4.1
