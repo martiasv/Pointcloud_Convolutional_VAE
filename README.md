@@ -1,5 +1,6 @@
 # Pointcloud Convolutional Variational Autoencoder
 
+
 ![plot](/illustrations/convolutional_variational_autoencoder.png)
 
 This repository contains the framework needed for collecting TSDF pointclouds, shuffling them, and using them for training a 3D Convolutional Variational Autoencoder (CVAE). 
@@ -20,4 +21,8 @@ Input pointcloud from the TSDF_server       |  Reconstructed pointcloud from the
 :-------------------------:|:-------------------------:
 ![plot](/illustrations/IL_perfect_tsdf.png)  |  ![plot](/illustrations/IL_perfect_recon.png)
 
+
+### Generation of training environment and shuffling of objects
+A secondary functionality included in this repository is the generation of obstacles to populate an empty .world-file. This includes a script that writes the XML-code for obstacles of different shapes and sizes, which then can be added to the .world-file used for simulation.
+A script for randomly scrambling the positions of the obstacles is also included. This takes the form of a ROS-service that can be called during the collection of pointclouds, or from the Learning-Based training process, so that the environment may be scrambled at certain intervals. 
 
