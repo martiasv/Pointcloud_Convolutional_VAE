@@ -1,4 +1,5 @@
 #This script shuffles the dataset across batches, so that each batch has the same distribution of pointcloud examples. 
+#Run this outside of the ROS framework, call "python dataset_shuffler.py"
 
 import pickle
 import matplotlib.pyplot as plt

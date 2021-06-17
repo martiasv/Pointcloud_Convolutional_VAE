@@ -11,10 +11,12 @@ from datetime import timedelta
 import matplotlib.pyplot as plt
 import pickle
 
+# Run the following in the root directory: rosrun pointcloud_utils PC2_to_3Darray_sub.py
+
 """This script collects PoincCloud2 TSDF messages from the VoxBlox TSDF server package, converts them to numpy arrays and pickles them. """
 
 class unordered_pointcloud_to_3Darray_dataset():
-    def __init__(self,pc_topic="/tsdf_server/tsdf_pointcloud"):
+    def __init__(self,pc_topic="gagarin/tsdf_server/tsdf_pointcloud"):
         self.pc_sub = rospy.Subscriber(pc_topic,PointCloud2,self.point_cloud_callback)
         self.XYZI_pointclouds = []
         self.count = 0

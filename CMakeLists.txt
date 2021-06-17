@@ -46,7 +46,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-catkin_install_python(PROGRAMS scripts/gazebo_env_scrambler.py scripts/overfitted_gazebo_env_scrambler.py
+catkin_install_python(PROGRAMS scripts/Simulation_scrambling_scripts/gazebo_env_scrambler.py scripts/Simulation_scrambling_scripts/overfitted_gazebo_env_scrambler.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
