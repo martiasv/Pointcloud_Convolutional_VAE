@@ -1,4 +1,6 @@
-**Pointcloud Convolutional Variational Autoencoder**
+# Pointcloud Convolutional Variational Autoencoder
+
+![plot](/illustrations/convolutional_variational_autoencoder.png)
 
 This repository contains the framework needed for collecting TSDF pointclouds, shuffling them, and using them for training a 3D Convolutional Variational Autoencoder (CVAE). 
 We extract the Encoder-part of this CVAE structure to be used with a Learning-Based agent which is trained to navigate and control a MAV for executing collision-free paths. This framework also integrates functionality for monitoring the performance of the CVAE in real-time by visualizing the reconstructed pointcloud from the Decoder-part of the network. 
