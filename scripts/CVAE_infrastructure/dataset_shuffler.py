@@ -1,5 +1,4 @@
-#This script shuffles the dataset across batches, so that each batch has the same distribution
-##Setup
+#This script shuffles the dataset across batches, so that each batch has the same distribution of pointcloud examples. 
 
 import pickle
 import matplotlib.pyplot as plt
@@ -8,8 +7,6 @@ import numpy as np
 
 pointcloud_list = []
 num_batches = 1
-#names_envs = ['cave','test_tunnel']
-#names_envs = ['small_obstacles','large_obstacles','cave','tunnel']
 
 ##Load dataset
 for i in range(num_batches):
